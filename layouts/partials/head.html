@@ -1,0 +1,18 @@
+<title>{{ if .Title }}{{ .Title }}{{ else if .Site.Title }}{{ .Site.Title }}{{ end }}</title>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+{{ $options := (dict "targetPath" "css/style.css" "outputStyle" "compressed" "enableSourceMap" true "includePaths" (slice "themes/simpleit/node_modules")) }}
+{{ $style := resources.Get "sass/main.scss" | toCSS $options | postCSS | minify | fingerprint }}
+<link rel="stylesheet" href="{{ $style.RelPermalink }}" >
+
+{{ $js := resources.Get "js/transformations.js" | minify | fingerprint}}
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="{{ $js.Permalink }}"></script>
+
+
+<meta
+ name="description"
+ content="{{ if .Params.summary }}{{ .Params.summary }}{{ else if .Site.Params.Description }}{{ .Site.Params.Description }}{{ end }}"
+/>
