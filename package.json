@@ -1,5 +1,5 @@
 {
     "dependencies": {
-        "mellor-style": "^0.0.3"
+        "mellor-style": "git@github.com:dermellor/mellor-style.git"
     }
 }
