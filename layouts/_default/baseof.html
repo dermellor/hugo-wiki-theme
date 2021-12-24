@@ -1,11 +1,126 @@
 <!DOCTYPE html>
-<html>
-    {{- partial "head.html" . -}}
-    <body class="d-flex flex-column min-vh-100">
-        {{- partial "header.html" . -}}
-        <div id="content" class="container">
-            {{- block "main" . }}{{- end }}
+<html lang="{{ .Lang }}" {{ if or (eq .Lang "ar") (eq .Lang "fa") }}dir="rtl"{{ end }}>
+
+  <head>
+    {{ partial "head-meta.html" . }}
+
+    {{ block "schema-dot-org" . }}
+      <!-- schema.org metadata differs for Nodes and Pages -->
+    {{ end }}
+
+    {{ if .Params.canonicalUrl }}
+      <link rel="canonical" href="{{ .Params.canonicalUrl }}">
+    {{ else }}
+      {{/* https://moonbooth.com/hugo/seo/#what-is-a-self-referential-canonical-link */}}
+      <link rel="canonical" href="{{ .Permalink }}">
+    {{ end }}
+
+    <title>{{ block "title" . }}{{ .Site.Title }}{{ end }}</title>
+
+    {{ if or (eq .Lang "ar") (eq .Lang "fa") }}
+    {{ "<!-- RTL -->" | safeHTML }}
+    {{ $styleRtl := resources.Get "css/style.rtl.css" | resources.Fingerprint }}
+    <link href="{{ $styleRtl.Permalink }}" rel="stylesheet"{{ if not .Site.Params.disable_sri }} integrity="{{ $styleRtl.Data.Integrity }}" crossorigin="anonymous"{{ end }}>
+    {{ else }}
+    {{ "<!-- combined, minified CSS -->" | safeHTML }}
+    {{ $options := (dict "includePaths" (slice "themes/hugo-theme-bootstrap4-blog")) }}
+    {{ $style := resources.Get "sass/main.scss" | toCSS $options | resources.Fingerprint}}
+    <link href="{{ $style.Permalink }}" rel="stylesheet"{{ if not .Site.Params.disable_sri }} integrity="{{ $style.Data.Integrity }}" crossorigin="anonymous"{{ end }}>
+    {{ end }}
+
+    {{ "<!-- RSS 2.0 feed -->" | safeHTML }}
+    {{ with .OutputFormats.Get "rss" -}}
+      {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
+    {{ end -}}
+
+    {{ template "_internal/google_analytics_async.html" . }}
+
+    {{ if .Site.Params.cookie_consent_info_url }}
+    {{ partial "cookie-consent.html" . }}
+    {{ end }}
+
+    {{ partial "head-custom.html" . }}
+  </head>
+
+  <body class="d-flex flex-column min-vh-100">
+
+
+    {{ block "masthead" . }}
+    <div class="blog-masthead">
+      <div class="container">
+        <nav class="nav blog-nav">
+          <a class="nav-link {{ if .IsHome }}active{{ end }}" href="{{ .Site.BaseURL | absLangURL }}">{{ i18n "home" }}</a>
+          {{- $currentPage := . -}}
+          {{ range .Site.Menus.navbar }}
+          {{ $menuURL := .URL | absLangURL }}
+          <a class="nav-link{{ if or ($currentPage.IsMenuCurrent "navbar" .) ($currentPage.HasMenuCurrent "navbar" .) }} active{{end}}" href="{{ .URL }}" title="{{ .Title }}">{{ .Name }}</a>
+          {{ end }}
+        </nav>
+      </div>
+    </div>
+    {{ end }}
+
+    {{ block "header" . }}
+    {{ if (ne .Site.Params.header_visible false) }}
+    <header class="blog-header">
+      <div class="container">
+        <h1 class="blog-title" dir="auto"><a href="{{ .Site.BaseURL | absURL }}" rel="home">{{ .Site.Title | safeHTML }}</a></h1>
+        {{ if .Site.Params.description }}<p class="lead blog-description" dir="auto">{{ .Site.Params.description | markdownify }}</p>{{ end }}
+      </div>
+    </header>
+    {{ end }}
+    {{ end }}
+
+    {{ block "body" . }}
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 blog-main">
+
+          {{ block "main" . }}
+          <!-- The part of the page that begins to differ between templates -->
+          {{ end }}
+
+        </div> {{ "<!-- /.blog-main -->" | safeHTML }}
+
+        {{ partial "sidebar.html" . }}
+
+      </div> {{ "<!-- /.row -->" | safeHTML }}
+    </div> {{ "<!-- /.container -->" | safeHTML }}
+    {{ end }}
+
+    {{ block "footer" . }}
+    <div class="mt-auto">
+
+      <footer class="footer bg-light mt-3">
+        <div class="container">
+            <p>
+              <img width="200" src="https://api.thegreenwebfoundation.org/greencheckimage/www.marcelmellor.com?nocache=true" alt="This website is hosted Green - checked by thegreenwebfoundation.org">
+            </p>
+            <p dir="auto">
+            {{ if .Site.Copyright }}
+              {{ .Site.Copyright | markdownify }}
+            {{ else }}
+
+            {{ end }}
+            | <a href="/datenschutz/">Datenschutz</a> | <a href="/impressum/">Impressum</a>
+            </p>
+            <p>
+            <a href="#">{{ i18n "backToTop" }}</a>
+            </p>
         </div>
-        {{- partial "footer.html" . -}}
-    </body>
+      </footer>
+
+    </div>
+    
+    {{ end }}
+
+    <!-- VG WORT Pixel -->
+    {{ if .Params.vgwortid }}
+      <img src="https://vg08.met.vgwort.de/na/{{ .Params.vgwortid }}" width="1" height="1" alt="">
+    {{ end }}
+
+  </body>
+
 </html>
+
+{{- /* vim: set ts=2 sw=2 et: */}}

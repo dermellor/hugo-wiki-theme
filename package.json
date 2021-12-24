@@ -1,5 +1,11 @@
 {
     "dependencies": {
+        "cookieconsent": "^3.1.1",
         "mellor-style": "git@github.com:dermellor/mellor-style.git"
+    },
+    "scripts": {
+        "build:cookieconsent": "cp node_modules/cookieconsent/build/cookieconsent.min.css assets/css && cp node_modules/cookieconsent/build/cookieconsent.min.js assets/js",
+        "build": "npm run build:cookieconsent && npm run clean",
+        "clean": "rm assets/css/style.css.tmp assets/css/style.rtl.css.tmp"
     }
 }
