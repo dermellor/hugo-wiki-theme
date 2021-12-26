@@ -48,7 +48,9 @@
     {{ block "masthead" . }}
     <div class="blog-masthead">
       <div class="container">
-        <nav class="nav blog-nav">
+        <div class="row justify-content-center">
+          <div class="col-sm-8">
+        <nav class="nav blog-nav navbar-nav">
           <a class="nav-link {{ if .IsHome }}active{{ end }}" href="{{ .Site.BaseURL | absLangURL }}">{{ i18n "home" }}</a>
           {{- $currentPage := . -}}
           {{ range .Site.Menus.navbar }}
@@ -56,6 +58,8 @@
           <a class="nav-link{{ if or ($currentPage.IsMenuCurrent "navbar" .) ($currentPage.HasMenuCurrent "navbar" .) }} active{{end}}" href="{{ .URL }}" title="{{ .Title }}">{{ .Name }}</a>
           {{ end }}
         </nav>
+        </div>
+        </div>
       </div>
     </div>
     {{ end }}
@@ -73,7 +77,7 @@
 
     {{ block "body" . }}
     <div class="container">
-      <div class="row">
+      <div class="row justify-content-center">
         <div class="col-sm-8 blog-main">
 
           {{ block "main" . }}
@@ -89,22 +93,36 @@
     {{ end }}
 
     {{ block "footer" . }}
+
     <div class="mt-auto">
 
       <footer class="footer bg-light mt-3">
         <div class="container">
-            <p>
-              <img width="200" src="https://api.thegreenwebfoundation.org/greencheckimage/www.marcelmellor.com?nocache=true" alt="This website is hosted Green - checked by thegreenwebfoundation.org">
-            </p>
+            {{ if .Site.Params.greenweb }}
+              <p>
+                <img width="200" src="{{.Site.Params.greenweb }}" alt="This website is hosted Green - checked by thegreenwebfoundation.org">
+              </p>
+            {{ end }}
+
             <p dir="auto">
             {{ if .Site.Copyright }}
               {{ .Site.Copyright | markdownify }}
             {{ else }}
 
             {{ end }}
-            | <a href="/datenschutz/">Datenschutz</a> | <a href="/impressum/">Impressum</a>
+
+
+            <ul>
+              {{ range .Site.Params.footer_links }}
+                <li>
+                  <a href="{{ .url }}">{{ .title }}</a>
+                </li>
+              {{ end }}
+            </ul>
+
             </p>
             <p>
+
             <a href="#">{{ i18n "backToTop" }}</a>
             </p>
         </div>
