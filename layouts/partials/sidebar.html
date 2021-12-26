@@ -1,5 +1,5 @@
+{{ if and (.Site.Params.sidebar) (isset .Site.Params.sidebar "about") }}
 <aside class="col-sm-3 ml-auto blog-sidebar">
-  {{ if and (.Site.Params.sidebar) (isset .Site.Params.sidebar "about") }}
   <section class="sidebar-module sidebar-module-inset">
     <h4>{{ i18n "about" }}</h4>
     <p dir="auto">{{ .Site.Params.sidebar.about | markdownify }}</p>
@@ -19,7 +19,7 @@
       {{ end }}
     </ol>
   </section>
-  {{ end }}
 </aside><!-- /.blog-sidebar -->
+{{ end }}
 
 {{- /* vim: set ts=2 sw=2 et: */}}
