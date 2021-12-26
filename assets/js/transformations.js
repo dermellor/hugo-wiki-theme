@@ -11,12 +11,6 @@ function docReady(fn) {
 
 docReady(function() {
 
-    var tables = document.querySelectorAll('table');
-    for ( var i = 0; i < tables.length; i++) {
-        tables[i].classList.add("table");
-        tables[i].classList.add("table-striped");
-    }
-
     var blockquotes = document.querySelectorAll('blockquote');
     for ( var i = 0; i < blockquotes.length; i++) {
         blockquotes[i].classList.add("blockquote");
@@ -37,4 +31,3 @@ docReady(function() {
     }
 
 });
-
