@@ -8,6 +8,11 @@ function docReady(fn) {
     }
 }    
 
+function wrap(el, wrapper) {
+    el.parentNode.insertBefore(wrapper, el);
+    wrapper.appendChild(el);
+}
+
 
 docReady(function() {
 
@@ -16,8 +21,6 @@ docReady(function() {
         blockquotes[i].classList.add("blockquote");
 
         var source = blockquotes[i].lastElementChild;
-
-        //TODO: Wrap blockquote and caption in figure element
 
         if(source.innerText.match(/– (.*)/)) {
             blockquotes[i].removeChild(source);
@@ -30,4 +33,12 @@ docReady(function() {
         }
     }
 
+    var tables =  document.querySelectorAll('table');
+    for ( var i = 0; i < tables.length; i++) {
+        var tableWrapper = document.createElement('div');
+        tableWrapper.classList.add("table-responsive")
+        wrap(tables[i], tableWrapper);
+    }
+
 });
+
