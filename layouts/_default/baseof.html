@@ -48,12 +48,13 @@
     {{ block "masthead" . }}
 
 
-    <div class="bg-light">
+    <nav class="bg-light">
       <div class="container">
           <div class="row justify-content-center">
             <div class="col-lg-9 col-xl-7 col-xxl-6">
-              <nav class="navbar navbar-expand-lg navbar-light bg-light">
 
+
+              <div class="navbar navbar-expand-lg navbar-light bg-light">
                 <a class="navbar-brand {{ if .IsHome }}active{{ end }}" href="{{ .Site.BaseURL | absLangURL }}">{{ i18n "home" }}</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
@@ -68,13 +69,15 @@
                       </li>
                     {{ end }}
                   </ul>
+                </div>
+              </div>
 
-              </nav>
+
           </div>
 
         </div>
       </div>
-    </div>
+    </nav>
 
 
     
