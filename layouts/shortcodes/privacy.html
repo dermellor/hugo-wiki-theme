@@ -1,0 +1,29 @@
+
+{{$type := .Get 1 }}
+{{$.Scratch.Set "isActive" true }}
+
+
+{{ if eq $type "GoogleAnalytics" }}    
+    {{ if not (.Site.GoogleAnalytics) }}
+        {{$.Scratch.Set "isActive" false }}
+    {{ end }}
+{{ end }}
+
+
+{{ if eq $type "Cookies" }}    
+    {{ if not (.Site.Params.cookie_consent_info_url) }}
+        {{$.Scratch.Set "isActive" false }}
+    {{ end }}
+{{ end }}
+
+{{ if eq $type "GoatCounter" }}    
+    {{ if not (.Site.Params.goatcounter) }}
+        {{$.Scratch.Set "isActive" false }}
+    {{ end }}
+{{ end }}
+
+
+{{ if $.Scratch.Get "isActive" }}
+    {{ $file := .Get 0}}
+    {{ $file | readFile | markdownify}}
+{{ end }}
