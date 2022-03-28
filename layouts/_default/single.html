@@ -58,16 +58,25 @@
   {{ if not (strings.Contains .Content "<h1") }}
 
     <header>
-      <h2 class="blog-post-title" dir="auto"><a href="{{ .Permalink }}">{{ .Title | markdownify }}</a></h2>
+      <h1>{{ .Title | markdownify }}</h1>
       {{if eq .Section "posts"}}
         <p class="blog-post-meta"><time {{ .Date.Format "2006-01-02T15:04:05Z07:00" | printf "datetime=%q" | safeHTMLAttr }}>{{ .Date.Format $dateFormat }}</time> {{ if or (.Params.categories) (.Params.tags) }} {{ i18n "postedIn" }} {{ partial "meta-terms.html" . }}{{ end }}</p>
       {{end}}
     </header>
 
+    {{ .Content }}
+
+  {{ else }}
+    <header>
+      {{ safeHTML (index (split .Content "</h1>") 0 )}}</h1>
+      {{if eq .Section "posts"}}
+        <p class="blog-post-meta"><time {{ .Date.Format "2006-01-02T15:04:05Z07:00" | printf "datetime=%q" | safeHTMLAttr }}>{{ .Date.Format $dateFormat }}</time> {{ if or (.Params.categories) (.Params.tags) }} {{ i18n "postedIn" }} {{ partial "meta-terms.html" . }}{{ end }}</p>
+      {{end}}
+    </header>
+    {{ safeHTML (index (split .Content "</h1>") 1 )}}
   {{ end }}
   
 
-  {{ .Content }}
 
   {{ if .IsTranslated }}
   <h4>{{ i18n "translations" }}</h4>
@@ -80,19 +89,25 @@
   </ul>
   {{ end }}
 
-  {{ if or (ne ($.Param "sharingicons") false) (.Site.DisqusShortname) }}
-  <hr>
+  
   <footer>
 
-  {{ if (ne ($.Param "sharingicons") false) }}
-  {{ partial "sharing-icons.html" . }}
-  {{ end }}
+  {{if eq .Section "posts"}}
 
-  {{ if and (.Site.DisqusShortname) (ne .Params.comments false) }}
-  {{ template "_internal/disqus.html" . }}
+    {{ if (ne ($.Param "sharingicons") false) }}
+    {{ partial "sharing-icons.html" . }}
+    {{ end }}
+
+    {{ if (ne ($.Param "newsletter_subscription_address") false) }}
+    {{ partial "newsletter.html" . }}
+    {{ end }}
+
+    {{ if and (.Site.DisqusShortname) (ne .Params.comments false) }}
+    {{ template "_internal/disqus.html" . }}
+    {{ end }}
+
   {{ end }}
   </footer>
-  {{ end }}
 
 </article> <!-- /.blog-post -->
 
