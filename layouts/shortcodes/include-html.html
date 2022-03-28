@@ -1,3 +1,10 @@
 
 {{ $file := .Get 0 }}
-{{ $file | readFile | safeHTML }}
+{{ $output := $file  | readFile }}
+
+{{ $old := "src=\"/" }}
+{{ $new := print "src=\"" .Site.BaseURL}}
+
+{{ $output :=  replace $output $old $new }}
+
+{{ $output | safeHTML }}
