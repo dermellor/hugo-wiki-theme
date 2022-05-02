@@ -62,7 +62,7 @@ Verantwortlicher im Sinne der Datenschutz-Grundverordnung, sonstiger in den Mitg
 
 {{< address >}}
 
-{{< privacy "_cookies.md" "Cookies" >}}
+{{< privacy ".cookies.md" "Cookies" >}}
 
 ### Erfassung von allgemeinen Daten und Informationen   
 
@@ -70,7 +70,7 @@ Meine Internetseite erfasst mit jedem Aufruf der Internetseite durch dich oder e
 
 Falls ich einmal in diese Daten hineinschaue, dann um (1) die Inhalte meiner Website korrekt auszuliefern, (2) die Inhalte meine Website sowie die Werbung dafür zu optimieren, (3) zu gewährleisten, dass die Website erreichbar ist bzw. zu prüfen, warum sie nicht erreichbar (4) um Strafverfolgungsbehörden im Falle eines Cyberangriffes die Informationen bereitzustellen, die zur Strafverfolgung notwendig sind. Kurz, diese anonym erhobenen Daten und Informationen werden durch mich statistisch und mit dem Ziel ausgewertet, den Datenschutz und die Datensicherheit zu erhöhen. Das heißt, ich möchte ein optimales Schutzniveau für die von mir verarbeiteten personenbezogenen Daten sicherstellen. Die anonymen Daten der Server-Logfiles werden getrennt von allen durch dich angegebenen personenbezogenen Daten gespeichert.
 
-{{< privacy "_newsletter.md" "Newsletter" >}}
+{{< privacy ".newsletter.md" "Newsletter" >}}
 
 ### Routinemäßige Löschung und Sperrung von personenbezogenen Daten   
 
@@ -182,9 +182,9 @@ Du hast das Recht, eine Einwilligung zur Verarbeitung deiner personenbezogener D
 
 Möchtest du dein Recht auf Widerruf einer Einwilligung geltend machen, kannst du dich hierzu jederzeit an mich wenden.
 
-{{< privacy "_googleanalytics.md" "GoogleAnalytics" >}}
+{{< privacy ".googleanalytics.md" "GoogleAnalytics" >}}
 
-{{< privacy "_goatcounter.md" "GoatCounter" >}}
+{{< privacy ".goatcounter.md" "GoatCounter" >}}
 
 
 Angaben gemäß § 5 TMG:
