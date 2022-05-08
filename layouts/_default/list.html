@@ -15,7 +15,11 @@
   "dateModified": {{ .Date.Format $ISO8601 }},
   {{- end }}
   {{- /* all of the site's categories/tags, from Hugo's tpl/template_embedded.go */}}
+  {{- if isset .Site.Taxonomies "categories" }}
+  {{- if not (eq (len .Site.Taxonomies.categories) 0) }}
   "keywords": {{ range $plural, $terms := .Site.Taxonomies }}{{ range $term, $val := $terms }}{{ printf "%s," $term }}{{ end }}{{ end }}
+  {{- end}}
+  {{- end}}
   {{- with .Site.Params.description -}}
   ,
   "description": {{- . -}}
