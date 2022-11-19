@@ -1,0 +1,114 @@
+.book-shot-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 600px;
+  
+  
+    @keyframes initAnimation {
+      0% {
+        transform: rotateY(0deg);
+      }
+      100% {
+        transform: rotateY(-30deg);
+      }
+    }
+  
+    .book-shot {
+      position: relative;
+      transform-style: preserve-3d;
+      transform: rotateY(-30deg);
+      transition: 1s ease;
+      animation: 1s ease 0s 1 initAnimation;
+    }
+  
+  
+  
+    .book-shot > :first-child {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: red;
+      transform: translateZ(25px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: 5px 5px 20px #666;
+    }
+  
+    .book-shot::before {
+      position: absolute;
+      content: ' ';
+      background-color: blue;
+      left: 0;
+      top: 3px;
+      width: 48px;
+      height: 294px;
+      background: linear-gradient(90deg, 
+        #fff 0%,
+        #f9f9f9 5%,
+        #fff 10%,
+        #f9f9f9 15%,
+        #fff 20%,
+        #f9f9f9 25%,
+        #fff 30%,
+        #f9f9f9 35%,
+        #fff 40%,
+        #f9f9f9 45%,
+        #fff 50%,
+        #f9f9f9 55%,
+        #fff 60%,
+        #f9f9f9 65%,
+        #fff 70%,
+        #f9f9f9 75%,
+        #fff 80%,
+        #f9f9f9 85%,
+        #fff 90%,
+        #f9f9f9 95%,
+        #fff 100%
+        );
+    }
+  
+    .book-shot::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      content: ' ';
+      transform: translateZ(-25px);
+      background-color: #01060f;
+      border-radius: 0 2px 2px 0;
+      box-shadow: -10px 0 50px 10px #666;
+    }
+  
+  
+    $book-shot-ratio: 1.6;
+    $book-shot-width: 100px;
+    $book-shot-height: $book-shot-width * $book-shot-ratio;
+  
+  
+    .book-shot, .book-shot::after, .book-shot > :first-child  {
+      width: $book-shot-width;
+      height: $book-shot-height;
+      @include media-breakpoint-up(sm) { 
+        width: $book-shot-width * 1.5;
+        height: $book-shot-height * 1.5;    
+      }
+    }
+  
+    .book-shot::before {
+      transform: translateX(72px - 100px + $book-shot-width) rotateY(90deg);
+      height:$book-shot-height - 4px;
+      @include media-breakpoint-up(sm) { 
+        transform: translateX(72px - 100px + $book-shot-width * 1.5) rotateY(90deg);
+        height:$book-shot-height * 1.5 - 4px;    
+      }
+    }
+}
+
+.row.book-offer {
+    padding: 1em 0 2em 0;
+    &:hover {
+        .book-shot {
+          transform: rotateY(0deg);
+        }
+      }
+}

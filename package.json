@@ -5,6 +5,7 @@
     },
     "scripts": {
         "build:cookieconsent": "cp node_modules/cookieconsent/build/cookieconsent.min.css assets/css && cp node_modules/cookieconsent/build/cookieconsent.min.js assets/js",
+        "build:styles": "git clone https://github.com/dermellor/mellor-style.git assets/mellor-style",
         "build": "npm run build:cookieconsent && npm run clean",
         "clean": "rm assets/css/style.css.tmp assets/css/style.rtl.css.tmp"
     }

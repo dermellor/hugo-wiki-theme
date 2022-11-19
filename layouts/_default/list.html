@@ -30,19 +30,49 @@
 
 {{ define "main" }}
 
-{{ $truncate := default true .Site.Params.truncate }}
-{{ $paginator := .Paginate (where .Site.RegularPages "Section" "in" .Site.Params.mainSections) }}
-{{ range $paginator.Pages }}
-{{ if $truncate }}
-{{ .Render "summary" }}
-{{ else }}
-{{ .Render "content" }}
-{{ end }}
-{{ end }}
+<div class="list">
 
-{{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
-{{ partial "pagination.html" . }}
-{{ end }}
+  <h2 class="category">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                {{ .Title }}
+            </div>
+        </div>
+    </div>
+  </h2>
+
+  <div class="container">
+      
+      {{ $truncate := default true .Site.Params.truncate }}
+
+      {{ $pages := where .Site.RegularPages "Type" "posts" }}
+      {{ $pages := $pages | union (where .Site.RegularPages "Params.linkedinUrl" "!=" nil) }}
+      {{ $pages := $pages | union (where .Site.RegularPages "Params.twitterUrl" "!=" nil) }}
+      {{ $pages := $pages | intersect (where .Site.RegularPages "Params.date" "!=" nil) }}
+
+
+      {{ $paginator := .Paginate $pages }}
+
+      {{ range $paginator.Pages }}
+      {{ if $truncate }}
+      {{ .Render "summary" }}
+      {{ else }}
+      {{ .Render "content" }}
+      {{ end }}
+      {{ end }}
+
+    <div class="row">
+      <div class="col-12 col-lg-5 offset-xl-3">
+        {{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
+        {{ partial "pagination.html" . }}
+        {{ end }}
+      </div>
+    </div>
+
+  </div>
+
+</div>
 
 {{ end }}
 

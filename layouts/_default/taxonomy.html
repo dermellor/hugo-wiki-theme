@@ -1,18 +1,30 @@
 {{ define "main" }}
 
-{{ $truncate := default true .Site.Params.truncate }}
-{{ range .Paginator.Pages }}
-{{ if $truncate }}
-{{ .Render "summary" }}
-{{ else }}
-{{ .Render "content" }}
-{{ end }}
-{{ end }}
+    <h2 class="category">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    {{ .Title }}
+                </div>
+            </div>
+        </div>
+    </h2>
+    <div class="container">
 
-{{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
-{{ partial "pagination.html" . }}
-{{ end }}
+    {{ $truncate := default true .Site.Params.truncate }}
+    {{ range .Paginator.Pages }}
+    {{ if $truncate }}
+    {{ .Render "summary" }}
+    {{ else }}
+    {{ .Render "content" }}
+    {{ end }}
+    {{ end }}
 
+    {{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
+    {{ partial "pagination.html" . }}
+    {{ end }}
+
+    </div>
 {{ end }}
 
 {{- /* vim: set ts=2 sw=2 et: */}}

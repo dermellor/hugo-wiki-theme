@@ -22,10 +22,10 @@
 
 
 {{ $options := (dict "targetPath" "css/style.css" "outputStyle" "compressed" "enableSourceMap" true "includePaths" (slice "themes/simpleit/node_modules")) }}
-{{ $style := resources.Get "sass/main.scss" | toCSS $options | postCSS | minify | fingerprint }}
+{{ $style := resources.Get "sass/main.scss" | toCSS $options | postCSS | minify }}
 <link rel="stylesheet" href="{{ $style.RelPermalink }}" >
 
-{{ $js := resources.Get "js/transformations.js" | minify | fingerprint}}
+{{ $js := resources.Get "js/transformations.js" | minify }}
 <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 

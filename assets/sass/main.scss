@@ -1,2 +1,17 @@
 @import "custom_variables";
-@import "../../node_modules/mellor-style/sass/main.scss";
+@import "custom_styles";
+@import "../mellor-style/sass/main.scss";
+@import "bookshot.scss";
+
+
+h2.category {
+    @extend .display-5;
+    border-bottom: 2px solid black;
+    z-index: -2;
+    padding:0.15em;
+    padding-bottom:0;
+}
+
+.category-teaser {
+    margin-bottom:$headings-margin-bottom;
+}

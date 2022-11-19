@@ -34,18 +34,19 @@
 
   <body class="d-flex flex-column min-vh-100">
 
-
     {{ block "masthead" . }}
 
-
-    <nav class="bg-light">
+    <nav class="bg-dark">
       <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-lg-9 col-xl-7 col-xxl-6">
-
-
-              <div class="navbar navbar-expand-lg navbar-light bg-light">
-                <a class="navbar-brand {{ if .IsHome }}active{{ end }}" href="{{ .Site.BaseURL | absLangURL }}">{{ i18n "home" }}</a>
+          <div class="row">
+            <div class="col-lg-3 d-none d-lg-block position-absolute">
+                <div class="navbar navbar-expand-lg navbar-dark bg-dark">
+                  <a class="navbar-brand {{ if .IsHome }} d-lg-none {{ end }}" href="{{ .Site.BaseURL | absLangURL }}">Marcel Mellor</a>
+                </div>
+            </div>
+            <div class="col-lg-9 col-xl-7 col-xxl-6 offset-xl-3">
+              <div class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <a class="navbar-brand d-lg-none" href="{{ .Site.BaseURL | absLangURL }}">Marcel Mellor</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                   <span class="navbar-toggler-icon"></span>
                 </button>
@@ -76,37 +77,28 @@
 
     {{ block "header" . }}
     {{ if (ne .Site.Params.header_visible false) }}
-    <header class="blog-header">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-lg-9 col-xl-7 col-xxl-6">
-            <p class="h1" dir="auto"><a href="{{ .Site.BaseURL | absURL }}" rel="home">{{ .Site.Title | safeHTML }}</a></p>
-            {{ if .Site.Params.description }}
-            <p class="lead blog-description" dir="auto">{{ .Site.Params.description | markdownify }}</p>
-            {{ end }}  
-            <hr/>
-          </div>
-        </div>
-     </div>
-    </header>
+
     {{ end }}
     {{ end }}
 
     {{ block "body" . }}
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-9 col-xl-7 col-xxl-6 blog-main">
 
-          {{ block "main" . }}
-          <!-- The part of the page that begins to differ between templates -->
-          {{ end }}
+        {{ if .IsPage }}
+            <div class="container">
+            <div class="row">
+                <div class="col-lg-9 col-xl-7 col-xxl-6 offset-xl-3 blog-main">
+        {{ end }}
+                {{ block "main" . }}
+                    <!-- The part of the page that begins to differ between templates -->
+                {{ end }}
 
-        </div> {{ "<!-- /.blog-main -->" | safeHTML }}
-
-        {{ partial "sidebar.html" . }}
-
-      </div> {{ "<!-- /.row -->" | safeHTML }}
-    </div> {{ "<!-- /.container -->" | safeHTML }}
+        {{ if .IsPage }}
+                </div> {{ "<!-- /.blog-main -->" | safeHTML }}
+                {{ partial "sidebar.html" . }}
+            </div> {{ "<!-- /.row -->" | safeHTML }}
+            </div> {{ "<!-- /.container -->" | safeHTML }}
+        {{ end }}
+        
     {{ end }}
 
     {{ block "footer" . }}
@@ -115,33 +107,39 @@
 
       <footer class="footer bg-light mt-3">
         <div class="container">
-            {{ if .Site.Params.greenweb }}
-              <p>
-                <img width="200" src="{{.Site.Params.greenweb }}" alt="This website is hosted Green - checked by thegreenwebfoundation.org">
-              </p>
-            {{ end }}
+            <div class="d-flex flex-row">
+              <div class="d-flex offset-xl-3">
+                {{ if .Site.Params.greenweb }}
+                  <p>
+                    <img width="200" src="{{.Site.Params.greenweb }}" alt="This website is hosted Green - checked by thegreenwebfoundation.org">
+                  </p>
+                {{ end }}
 
-            <p dir="auto">
-            {{ if .Site.Copyright }}
-              {{ .Site.Copyright | markdownify }}
-            {{ else }}
+                {{ if .Site.Params.grabmeacoffee }}
+                    <p>
+                      <a class="btn btn-lg btn-outline-secondary" href="{{.Site.Params.grabmeacoffee }}"><img src="/images/grab-me-a-coffee-button.svg" /></a>
+                    </p>
+                {{ end }}
+              </div>
 
-            {{ end }}
+              <div class="d-flex flex-column ms-3">
+                <p dir="auto">
+                  {{ if .Site.Copyright }}
+                    {{ .Site.Copyright | markdownify }}
+                  {{ end }}
+                  <ul>
+                    {{ range .Site.Params.footer_links }}
+                      <li>
+                        <a href="{{ .url }}">{{ .title }}</a>
+                      </li>
+                    {{ end }}
+                  </ul>
+                </p>
+              </div>
 
+            </div>
+  
 
-            <ul>
-              {{ range .Site.Params.footer_links }}
-                <li>
-                  <a href="{{ .url }}">{{ .title }}</a>
-                </li>
-              {{ end }}
-            </ul>
-
-            </p>
-            <p>
-
-            <a href="#">{{ i18n "backToTop" }}</a>
-            </p>
         </div>
       </footer>
 
