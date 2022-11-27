@@ -107,7 +107,7 @@
 
       <footer class="footer bg-light mt-3">
         <div class="container">
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-column flex-sm-row text-center">
               <div class="d-flex offset-xl-3">
                 {{ if .Site.Params.greenweb }}
                   <p>
@@ -116,13 +116,13 @@
                 {{ end }}
 
                 {{ if .Site.Params.grabmeacoffee }}
-                    <p>
+                    <p class="mx-auto">
                       <a class="btn btn-lg btn-outline-secondary" href="{{.Site.Params.grabmeacoffee }}"><img src="/images/grab-me-a-coffee-button.svg" /></a>
                     </p>
                 {{ end }}
               </div>
 
-              <div class="d-flex flex-column ms-3">
+              <div class="d-flex flex-column ms-sm-3 text-center text-sm-start">
                 <p dir="auto">
                   {{ if .Site.Copyright }}
                     {{ .Site.Copyright | markdownify }}
