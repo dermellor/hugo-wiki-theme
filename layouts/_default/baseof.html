@@ -82,18 +82,19 @@
     {{ end }}
 
     {{ block "body" . }}
-
-        {{ if .IsPage }}
+        
+        {{ if or .IsPage (eq .Params.layout "single") }}
             <div class="container">
             <div class="row">
                 <div class="col-lg-9 col-xl-7 col-xxl-6 offset-xl-3 blog-main">
         {{ end }}
+        
                 {{ block "main" . }}
                     <!-- The part of the page that begins to differ between templates -->
                 {{ end }}
 
-        {{ if .IsPage }}
-                </div> {{ "<!-- /.blog-main -->" | safeHTML }}
+        {{ if or .IsPage (eq .Params.layout "single") }}
+              </div> {{ "<!-- /.blog-main -->" | safeHTML }}
                 {{ partial "sidebar.html" . }}
             </div> {{ "<!-- /.row -->" | safeHTML }}
             </div> {{ "<!-- /.container -->" | safeHTML }}
