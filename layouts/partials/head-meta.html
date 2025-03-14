@@ -1,10 +1,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+
 {{ template "_internal/opengraph.html" . }}
 {{ template "_internal/twitter_cards.html" . }}
 
-{{- with .Site.Params.google_verify_meta -}}
+<meta property="og:image" content="{{ partial "article-image" . }}"/>
+
+{{ with .Site.Params.google_verify_meta }}
 <meta name="google-site-verification" content="{{ . }}" />
 {{ end }}
 
@@ -22,12 +25,31 @@
 
 
 {{ $options := (dict "targetPath" "css/style.css" "outputStyle" "compressed" "enableSourceMap" true "includePaths" (slice "themes/simpleit/node_modules")) }}
-{{ $style := resources.Get "sass/main.scss" | toCSS $options | postCSS | minify }}
+{{ $style := resources.Get "sass/main.scss" | toCSS $options | postCSS | minify | fingerprint "sha256" }}
 <link rel="stylesheet" href="{{ $style.RelPermalink }}" >
 
-{{ $js := resources.Get "js/transformations.js" | minify }}
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+{{ $js := resources.Get "js/transformations.js" }}
 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" integrity="sha512-7Pi/otdlbbCR+LnW+F7PwFcSDJOuUJB3OxtEHbg4vSMvzvJjde4Po1v4BR9Gdc9aXNUNFVUY+SK51wWT8WF0Gg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.podlove.org/web-player/5.x/embed.js"></script>
 <script src="{{ $js.Permalink }}"></script>
+
+{{ $js := resources.Get "js/bounceback.min.js" | minify }}
+<script src="{{ $js.Permalink }}"></script>
+
+{{ $js := resources.Get "js/main.js" | minify }}
+<script src="{{ $js.Permalink }}"></script>
+
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],  // block
+      inlineMath: [['\\(', '\\)']]                  // inline
+    }
+  };
+</script>
+
 

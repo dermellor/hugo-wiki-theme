@@ -1,0 +1,7 @@
+{{if eq (.Get "type") "email"}}
+    <a class="btn btn-primary btn-lg mr-7 {{if eq (.Get "color") "dark"}} btn-dark text-white {{end}}" href="mailto:{{.Site.Params.email}}?subject={{ .Get "subject" | safeURL }}&body={{ .Get "message"  | safeURL }}">
+        {{ .Get "text" }}
+    </a>
+{{ else }}
+    <a class="btn btn-primary btn-lg mr-7 {{if eq (.Get "color") "dark"}} btn-dark text-white {{end}}" href="{{ .Get "url" }}">{{ .Get "text" }}</a>
+{{ end }}

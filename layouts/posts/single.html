@@ -1,0 +1,192 @@
+{{ define "title" }}{{ .Title | markdownify }} | {{ .Site.Title }}{{ end }}
+
+{{ define "schema-dot-org" }}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  {{- /* Google recommends the headline be no more than 110 characters */}}
+  "headline": {{ substr .Title 0 110 }},
+  {{- with .Params.images -}}{{ range first 1 . }}
+  "image": {
+    "@type": "ImageObject",
+    "url": {{ . | absURL }}
+    {{- /* Don't try to get imageConfig if image param is not local */ -}}
+    {{- if not (or (hasPrefix . "http://") (hasPrefix . "https://")) -}}
+    {{- with (imageConfig (printf "/static/%s" .)) -}}
+    ,
+    "height": "{{ .Height }}",
+    "width": "{{ .Width }}"
+    {{- end -}}
+    {{ end }}
+  },
+  {{- end -}}{{ end }}
+  "url": {{ printf "%s" .Permalink }},
+  "wordCount": "{{ .WordCount }}",
+  {{- $ISO8601 := "2006-01-02T15:04:05-07:00" }}
+  {{- if not .PublishDate.IsZero }}
+  "datePublished": {{ .PublishDate.Format $ISO8601 }},
+  {{- else }}
+  "datePublished": {{ .Date.Format $ISO8601 }},
+  {{- end }}
+  {{- if not .Lastmod.IsZero }}
+  "dateModified": {{ .Lastmod.Format $ISO8601 }},
+  {{- end }}
+  "author": {
+    "@type": "Person",
+    "name": {{ .Params.author | default .Site.Params.author }}
+  }
+  {{- if or (.Params.keywords) (or (.Params.categories) (.Params.tags)) -}}
+  ,
+  "keywords": {{ delimit (union .Params.keywords (union .Params.categories .Params.tags)) ", " }}
+  {{- end }}
+
+  {{- with .Params.description -}}
+  ,
+  "description": {{ . }}
+  {{- end }}
+}
+</script>
+
+{{ end }}
+
+{{ define "main" }}
+{{ $dateFormat := default "Mon Jan 2, 2006" (index .Site.Params "date_format") }}
+
+{{- $title :=  (printf "%s %s %s" "<h1>" (.Title | markdownify)  "</h1>") | safeHTML -}}
+{{- $body := partial "content-wikilinks" . }}
+
+{{ if  strings.Contains .Content "h1" }}
+  {{- $title =  (printf "%s %s" (index (split .Content "</h1>") 0 ) "</h1>") | safeHTML -}}
+  {{- $body =  (index (split (partial "content-wikilinks" .) "</h1>") 1) | safeHTML }}
+{{ end }}
+
+
+  <header class="">
+    <div class="container-fluid pt-3 p-lg-5 pt-lg-3">
+        <div class="row">
+          <div class="col-xl-10 col-xxl-8 offset-xxl-2">
+            {{if eq .Section "posts"}}
+              {{ if or (.Params.categories) (.Params.tags) }} {{ partial "meta-terms.html" . }}{{ end }}
+            {{end}}
+          {{ $title }}
+          </div>
+          <div class="col-12 col-xxl-8 offset-xxl-2">
+            {{ if .Params.audio }}
+              <div class="mt-3 mb-5">
+                {{ partial "audio-header" (dict "file" .Params.audio ) }}
+              </div>
+            {{ else }}
+              <hr/ class="my-5">
+            {{ end }}
+          </div>
+        </div>
+        {{if eq .Section "posts"}}
+        <div class="row">
+          <div class="col-lg-5 col-xxl-4 offset-xxl-2 mb-4 mb-lg-0">
+            <div class="article-illustration" style="background-image: url( {{ partial "article-image" . }} ); "></div>
+          </div>
+          <div class="col-lg-7 col-xxl-4 {{if (partial "article-image" .)}} {{else}}  {{end}} d-flex align-items-start flex-column">
+              <div class="lead d-flex w-100 mb-3 fw-bold ">
+                <div class=""><time {{ .Date.Format "2006-01-02T15:04:05Z07:00" | printf "datetime=%q" | safeHTMLAttr }}>{{ .Date.Format $dateFormat }}</time></div>
+                <div class="ms-auto">
+                    Artikel teilen
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ .Permalink }}"><i class="bi-linkedin ps-2"></i></a>
+                    <a href="mailto:?subject={{ .Title | safeURL }}&body={{ .Permalink  | safeURL }}"><i class="bi-send ps-2"></i></a>
+                </div>
+              </div>
+              <p class="lead mt-auto lh-sm fw-bold mb-5 mb-lg-0">
+                {{if .Params.teaser }}
+                  {{ .Params.teaser }}
+                {{ else if .Params.description -}}
+                  {{ .Params.description }}
+                {{- end }}
+              </p>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+  </header>
+
+  <div class="container-fluid p-lg-5">
+    <div class="row">
+      <div class="col-md-8 col-lg-6 col-xxxl-5 offset-md-2 offset-lg-3 blog-main m-xxxl-auto">
+        <article class="blog-post">
+            {{ $body }}
+          </article>
+        </div>
+      </div>
+  </div>
+
+
+<div class="container-fluid py-4 p-lg-5 bg-light">
+  <div class="row">
+
+    <div class="col-12 col-xxl-8 offset-xxl-2">
+
+      <!--
+
+      {{ if .IsTranslated }}
+      <h4>{{ i18n "translations" }}</h4>
+      <ul>
+        {{ range .Translations }}
+        <li>
+          <a href="{{ .Permalink }}">{{ .Lang }}: {{ .Title }}{{ if .IsPage }}{{ end }}</a>
+        </li>
+        {{ end }}
+      </ul>
+      {{ end }}
+      -->
+      
+      {{ if and (ne .Params.newsletter nil) ( ne .Params.newsletter "") }}
+        <strong>
+            {{ $newsletterNumber := findRESubmatch  "newsletter\\/(.+)" .Params.newsletter 1 }}
+            {{ $newsletterNumber = index (index $newsletterNumber 0) 1 }}
+            Dieser Artikel erschien in Ausgabe {{ $newsletterNumber }} meines wöchentlichen Newsletters "Tech is Good". Du kannst ihn <a href="/newsletter">hier abonnieren</a>.
+        </strong>
+
+      {{ end }}
+
+      
+      <footer>
+
+      {{if eq .Section "posts"}}
+
+        {{ if (ne ($.Param "sharingicons") false) }}
+        {{ partial "sharing-icons.html" . }}
+        {{ end }}
+
+        {{ if $.Param "newsletter_cta" }}
+
+          {{ if (ne ($.Param "newsletter_subscription_address") false) }}
+            {{ partial "newsletter.html" . }}
+          {{ end }}
+
+        {{ else }}
+          {{ partial "newsletter/form/big.html" (dict "utm_medium" "post") }}
+        {{ end }}
+
+        {{ if and (.Site.DisqusShortname) (ne .Params.comments false) }}
+        {{ template "_internal/disqus.html" . }}
+        {{ end }}
+
+      {{ end }}
+
+      {{ if and (ne .Params.appendix nil) ( ne .Params.appendix "") }}
+        <p>
+          {{ .Params.appendix | markdownify }}
+        </p>
+      {{ end }}
+
+      </footer>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+{{ end }}
+
+{{- /* vim: set ts=2 sw=2 et: */}}

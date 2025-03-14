@@ -1,8 +1,20 @@
-{{ if .Params.categories }}
-<span class="fas fa-folder" aria-hidden="true"></span>&nbsp;{{ range $index, $category := .Params.categories }}{{ if gt $index 0 }}{{ i18n "comma" }} {{ end }}<a href="{{ "/categories/" | relLangURL }}{{ . | urlize }}/" rel="category tag">{{ . }}</a>{{ end }}
-{{ end }}
 {{ if .Params.tags }}
-<span class="fas fa-tag" aria-hidden="true"></span>&nbsp;{{ range $index, $tag := .Params.tags }}{{ if gt $index 0 }}{{ i18n "comma" }} {{ end }}<a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}/" rel="tag">{{ . }}</a>{{ end }}
+    <p class="path pt-5 pb-2 text-muted">
+        Journal | {{ index .Params.categories 0 }} | 
+        {{ range $index, $tag := .Params.tags }}
+            {{ if gt $index 0 }}{{ i18n "comma" }} {{ end }}
+            {{ replace . "_" " " }}
+        {{ end }}
+    </p>
 {{ end }}
+
+    
+
+{{ if .Params.categories }}
+    <p class="category pt-4">
+        {{ range $index, $category := .Params.categories }}{{ if gt $index 0 }}{{ i18n "comma" }} {{ end }}<a href="{{ "/categories/" | relLangURL }}{{ . | urlize }}/" rel="category tag" data-category="{{ . }}">{{ . }}</a>{{ end }}
+    </p>
+{{ end }}
+
 
 {{- /* vim: set ts=2 sw=2 et: */}}

@@ -10,6 +10,8 @@
 
     {{ if .Params.canonicalUrl }}
       <link rel="canonical" href="{{ .Params.canonicalUrl }}">
+    {{ else if .Params.linkedin }}
+      <link rel="canonical" href="{{ .Params.linkedin }}">
     {{ else }}
       {{/* https://moonbooth.com/hugo/seo/#what-is-a-self-referential-canonical-link */}}
       <link rel="canonical" href="{{ .Permalink }}">
@@ -32,43 +34,72 @@
     {{ partial "head-custom.html" . }}
   </head>
 
-  <body class="d-flex flex-column min-vh-100">
+  <body class="d-flex flex-column min-vh-100 overflow-x-hidden {{.Type }} {{ if .IsHome }} home {{ end }} highlightr-realistic">
 
     {{ block "masthead" . }}
 
-    <nav class="bg-dark">
-      <div class="container">
-          <div class="row">
-            <div class="col-lg-3 d-none d-lg-block position-absolute">
-                <div class="navbar navbar-expand-lg navbar-dark bg-dark">
-                  <a class="navbar-brand {{ if .IsHome }} d-lg-none {{ end }}" href="{{ .Site.BaseURL | absLangURL }}">Marcel Mellor</a>
+    <div class="{{ if .IsHome }} {{else}} sticky-top {{ end }} bg-dark">
+      <div class="">
+        <nav class="container-fluid px-lg-5">
+            <div class="row position-relative {{ if .IsHome }} py-5 py-lg-0 {{ end }}">
+              <div style="height:5.1rem;" class="col-lg-2 d-none d-lg-block {{ if .IsHome }} px-0 position-absolute top-0 {{ else }} bg-dark {{end }}">
+            
+              </div>
+              <div class="bg-dark {{ if .IsHome }} col-12 col-lg-7 offset-xxxl-1 col-xxxl-5 position-absolute top-0 p-xxl-3 pe-xxl-0 {{else }} position-absolute col-12 offset-xxl-2 col-xxl-8 {{end}}">
+                <div class="navbar navbar-expand-lg navbar-dark">
+                  <a class="navbar-brand d-lg-none pe-5" href="{{ .Site.BaseURL | relLangURL }}">Marcel <br/>Mellor</a>
+                  {{ if not .IsHome }}
+                    <div class="flex-grow-1 d-lg-none">
+                      <button class="btn btn-primary subscribe-newsletter">Abonnieren</button>
+                    </div>
+                  {{ end }}
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse bg-dark" id="navbarNav">
+                    <ul class="navbar-nav d-flex align-items-center {{ if .IsHome }} w-100 {{ end }}">
+                      <a class="navbar-brand d-none d-lg-block" href="{{ .Site.BaseURL | relLangURL }}">Marcel <br/>Mellor</a>
+                      {{- $currentPage := . -}}
+                      {{ range .Site.Menus.navbar }}
+                      {{ $menuURL := .URL | relLangURL }}
+
+
+                        {{ if .HasChildren }}
+                          <li class="nav-item dropdown flex-fill">
+                            <a class="nav-link dropdown-toggle text-center {{ if or ($currentPage.IsMenuCurrent "navbar" .) ($currentPage.HasMenuCurrent "navbar" .) }} active{{end}}" href="{{ .URL }}" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" >
+                              <span>{{ .Name }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                              {{ range .Children }}
+                                <li class="text-center fs-5">
+                                  <a class="dropdown-item" href="{{ .URL }}">{{ .Name }} </a>
+                                </li>
+                              {{ end }}
+                            </ul>
+                          </li>
+                        {{ else }}
+                          <li class="nav-item flex-fill">
+                            <a class="nav-link text-center {{ if or ($currentPage.IsMenuCurrent "navbar" .) ($currentPage.HasMenuCurrent "navbar" .) }} active{{end}}" href="{{ .URL }}" title="{{ .Title }}">
+                              <span>{{ .Name }}</span>
+                            </a>
+                          </li>
+                        {{ end }}
+
+                      {{ end }}
+                      <!--
+
+                      -->
+                    </ul>
+                  </div>
+                  {{ if not .IsHome }}
+                    <button class="btn btn-primary d-none d-lg-block subscribe-newsletter">Abonnieren</button>
+                  {{ end }}
                 </div>
             </div>
-            <div class="col-lg-9 col-xl-7 col-xxl-6 offset-xl-3">
-              <div class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <a class="navbar-brand d-lg-none" href="{{ .Site.BaseURL | absLangURL }}">Marcel Mellor</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                  <ul class="navbar-nav">
-                    {{- $currentPage := . -}}
-                    {{ range .Site.Menus.navbar }}
-                    {{ $menuURL := .URL | absLangURL }}
-                      <li class="nav-item">
-                        <a class="nav-link{{ if or ($currentPage.IsMenuCurrent "navbar" .) ($currentPage.HasMenuCurrent "navbar" .) }} active{{end}}" href="{{ .URL }}" title="{{ .Title }}">{{ .Name }}</a>
-                      </li>
-                    {{ end }}
-                  </ul>
-                </div>
-              </div>
-
-
           </div>
-
-        </div>
+        </nav>
       </div>
-    </nav>
+    </div>
 
 
     
@@ -83,75 +114,93 @@
 
     {{ block "body" . }}
         
-        {{ if or .IsPage (eq .Params.layout "single") }}
-            <div class="container">
-            <div class="row">
-                <div class="col-lg-9 col-xl-7 col-xxl-6 offset-xl-3 blog-main">
+        {{ block "main" . }}
+            <!-- The part of the page that begins to differ between templates -->
         {{ end }}
-        
-                {{ block "main" . }}
-                    <!-- The part of the page that begins to differ between templates -->
-                {{ end }}
 
-        {{ if or .IsPage (eq .Params.layout "single") }}
-              </div> {{ "<!-- /.blog-main -->" | safeHTML }}
-                {{ partial "sidebar.html" . }}
-            </div> {{ "<!-- /.row -->" | safeHTML }}
-            </div> {{ "<!-- /.container -->" | safeHTML }}
-        {{ end }}
-        
     {{ end }}
 
     {{ block "footer" . }}
 
-    <div class="mt-auto">
+    <div class="bg-dark text-white">
+      <footer>
+      <div class="container-fluid px-lg-5 py-3">
+        <div class="row">
 
-      <footer class="footer bg-light mt-3">
-        <div class="container">
-            <div class="d-flex flex-column flex-sm-row text-center">
-              <div class="d-flex offset-xl-3">
-                {{ if .Site.Params.greenweb }}
-                  <p>
-                    <img width="200" src="{{.Site.Params.greenweb }}" alt="This website is hosted Green - checked by thegreenwebfoundation.org">
-                  </p>
-                {{ end }}
-
-                {{ if .Site.Params.grabmeacoffee }}
-                    <p class="mx-auto">
-                      <a class="btn btn-lg btn-outline-secondary" href="{{.Site.Params.grabmeacoffee }}"><img src="/images/grab-me-a-coffee-button.svg" /></a>
-                    </p>
-                {{ end }}
-              </div>
-
-              <div class="d-flex flex-column ms-sm-3 text-center text-sm-start">
-                <p dir="auto">
+            <div class="col-12 col-md-8  col-xxl-6 offset-xxl-2">
+              <ul class="nav justify-content-center justify-content-lg-start align-items-center">
+                <li class="nav-item p-2 ps-0">
                   {{ if .Site.Copyright }}
-                    {{ .Site.Copyright | markdownify }}
-                  {{ end }}
-                  <ul>
-                    {{ range .Site.Params.footer_links }}
-                      <li>
-                        <a href="{{ .url }}">{{ .title }}</a>
-                      </li>
-                    {{ end }}
-                  </ul>
-                </p>
-              </div>
-
+                  {{ .Site.Copyright | markdownify }}
+                {{ end }}
+                </li>
+                {{ range .Site.Params.footer_links }}
+                  <li class="nav-item">
+                    <a class="nav-link px-2 text-white" href="{{ .url }}">{{ .title }}</a>
+                  </li>
+                {{ end }}
+    
+              </ul>
             </div>
-  
+            <div class="col-12 col-md-4 col-xxl-2 ">
+              <ul class="nav justify-content-center justify-content-lg-end list-unstyled d-flex">
+                <li class="p-1 ps-3"><a class="text-white" href="#"><i class="bi-linkedin"></i></a></li>
+                <li class="p-1 ps-3"><a class="text-white" href="#"><i class="bi-instagram"></i></a></li>
+                <li class="p-1 ps-3"><a class="text-white" href="#"><i class="bi-threads"></i></a></li>
+              </ul>
+            </div>
 
         </div>
-      </footer>
-
+      </div>
+    </footer>
     </div>
     
     {{ end }}
 
-    <!-- VG WORT Pixel -->
+
+
+    <div class="modal" tabindex="-1" id="newsletter-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Die entscheidende Idee. In 5 Minuten.</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Der wöchentliche Aha-Moment für alle, die Innovation verstehen und vorantreiben wollen. Jeden Donnerstag in deinem Postfach.
+            </p>
+            {{ partial "newsletter/form/minimal.html"  (dict "utm_medium" "modal" "size" "big") }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/+esm'
+      mermaid.initialize({ 
+        startOnLoad: false,
+        'theme': 'base',
+        'themeVariables': {
+          'primaryColor': 'white',
+          'primaryTextColor': '#2F0D5B',
+          'primaryBorderColor': '#2F0D5B',
+          'lineColor': '#2F0D5B',
+          'fontFamily': 'ABC Favorit',
+          'tertiaryColor': '#fff',
+          'strokeWidth': '3'
+        }
+      });
+      await mermaid.run({
+        querySelector: '.language-mermaid',
+      });
+    </script>
+
+     <!-- VG WORT Pixel -->
     {{ if .Params.vgwortid }}
-      <img src="https://vg08.met.vgwort.de/na/{{ .Params.vgwortid }}" width="1" height="1" alt="">
+       <img src="https://vg08.met.vgwort.de/na/{{ .Params.vgwortid }}" width="1" height="1" alt="">
     {{ end }}
+  
 
   </body>
 

@@ -35,7 +35,7 @@
   <h2 class="category">
     <div class="container">
         <div class="row">
-            <div class="col-12">
+            <div class="category-title">
                 {{ .Title }}
             </div>
         </div>
@@ -43,23 +43,20 @@
   </h2>
 
   <div class="container">
+    
       
       {{ $truncate := default true .Site.Params.truncate }}
-
-      {{ $pages := where .Site.RegularPages "Type" "posts" }}
-      {{ $pages := $pages | union (where .Site.RegularPages "Params.linkedinUrl" "!=" nil) }}
-      {{ $pages := $pages | union (where .Site.RegularPages "Params.twitterUrl" "!=" nil) }}
-      {{ $pages := $pages | intersect (where .Site.RegularPages "Params.date" "!=" nil) }}
-
+      
+      {{ $pages := .Pages }}
 
       {{ $paginator := .Paginate $pages }}
 
       {{ range $paginator.Pages }}
-      {{ if $truncate }}
-      {{ .Render "summary" }}
-      {{ else }}
-      {{ .Render "content" }}
-      {{ end }}
+        {{ if $truncate }}
+          {{ .Render "summary" }}
+        {{ else }}
+          {{ .Render "content" }}
+        {{ end }}
       {{ end }}
 
     <div class="row">

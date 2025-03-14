@@ -1,0 +1,18 @@
+{{- .Scratch.Add "image" "" -}}
+{{- $imageRegex := "\\/Bilder\\/(.+\\.[a-zA-Z]+)" -}}
+{{- $images := .Content | findRE $imageRegex -}}
+{{- range first 1 $images -}}
+	{{- $.Scratch.Set "image" . -}}
+{{- end -}}
+
+{{- range .Params.images -}}
+    {{- $.Scratch.Set "image" . -}}
+{{- end -}}
+
+{{- range .Site.Params.content_filters -}}
+	{{- $image := replace ($.Scratch.Get "image") .search .replace  -}}
+	{{- $.Scratch.Set "image" $image -}}
+{{- end -}}
+
+{{- $image := .Scratch.Get "image" -}}
+{{- $image -}}

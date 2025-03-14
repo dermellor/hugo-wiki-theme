@@ -1,30 +1,46 @@
 {{ define "main" }}
 
-    <h2 class="category">
-        <div class="container">
+    {{ partial "pageheader.html"  . }}
+
+
+    <section class="journal py-5 p-lg-5">
+        <div class="container-fluid">
             <div class="row">
-                <div class="col-12">
-                    {{ .Title }}
-                </div>
+                <div class="col-12 col-xxl-8 offset-xxl-2">
+      
+                {{ $truncate := default true .Site.Params.truncate }}
+                
+                {{ $pages := .Pages }}
+                {{ $pages := $pages | intersect (where .Site.RegularPages "Params.date" "!=" nil) }}
+                {{ $pages := $pages | intersect (where .Site.RegularPages "Language.Lang" .Site.Language.Lang) }}
+                
+            
+                {{ $paginator := .Paginate $pages.ByDate.Reverse }}
+            
+            
+                {{ $lastPost := index (last 1 $paginator.Pages) 0 }}
+
+                {{ range $paginator.Pages }}
+                    {{ if $truncate }}
+                        {{ .Render "summary" }}
+                    {{ else }}
+                        {{ .Render "content" }}
+                    {{ end }}
+
+                    {{ if not (eq $lastPost.Permalink .Permalink) }} 
+                        <hr class="py-3"/>
+                    {{ end }}
+
+                {{ end }}
+                
+            
+                {{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
+                    {{ partial "pagination.html" . }}
+                {{ end }}
             </div>
         </div>
-    </h2>
-    <div class="container">
+      </section>
 
-    {{ $truncate := default true .Site.Params.truncate }}
-    {{ range .Paginator.Pages }}
-    {{ if $truncate }}
-    {{ .Render "summary" }}
-    {{ else }}
-    {{ .Render "content" }}
-    {{ end }}
-    {{ end }}
-
-    {{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
-    {{ partial "pagination.html" . }}
-    {{ end }}
-
-    </div>
 {{ end }}
 
 {{- /* vim: set ts=2 sw=2 et: */}}

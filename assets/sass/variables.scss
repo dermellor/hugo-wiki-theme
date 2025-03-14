@@ -1,0 +1,68 @@
+/* Colors */
+
+$purple: #2F0D5B;
+
+$white: white;
+//$white: #FBFBFB;
+$orange: #FFA800;
+$orange-500: $orange;
+$orange-400: #E8AC68 ;
+$orange-300: #F4D5B4;
+
+$pink: #F32ED4;
+$green: #94D825;
+$gray-800: #2C3333;
+
+
+$link-hover-color: #E99842;    
+$primary: $orange-400; 
+$secondary: $purple;
+$link-color: $primary;
+$danger: red;
+$dark: $purple;
+$light: #F9F9F9;
+$body-color: $purple;
+
+$navbar-height: 4rem;
+$navbar-dark-hover-color: $white;
+$navbar-dark-color: $white;
+$navbar-brand-height: 1rem;
+$navbar-padding-y: 0;
+$navbar-nav-link-padding-x: 0;
+$navbar-brand-padding-y: 0.75rem;
+$navbar-brand-margin-end: 0rem;
+
+$dropdown-dark-bg: $purple;
+$dropdown-border-width: 0;
+$btn-close-color: $purple;
+
+$link-color: $dark;
+$hr-color: $dark;
+$list-group-border-color: $dark;
+
+/* set the overriding variables */
+$grid-breakpoints: (
+  xxxs: 0,
+  xxs: 320px,
+  xs: 568px,
+  sm: 667px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1440px,
+  xxxl: 1600px,
+  wide: 2200px
+);
+
+$container-max-widths: (
+  xxxs: 0,
+  xxs: 320px,
+  xs: 568px,
+  sm: 667px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1440px,
+  xxxl: 1600px,
+  wide: 2200px
+);

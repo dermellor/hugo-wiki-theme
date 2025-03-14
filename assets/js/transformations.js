@@ -16,29 +16,9 @@ function wrap(el, wrapper) {
 
 docReady(function() {
 
-    var blockquotes = document.querySelectorAll('blockquote');
-    for ( var i = 0; i < blockquotes.length; i++) {
-        blockquotes[i].classList.add("blockquote");
-
-        var source = blockquotes[i].lastElementChild;
-
-        if(source.innerText.match(/– (.*)/)) {
-            blockquotes[i].removeChild(source);
-
-            var figcaptionEl = document.createElement("figcaption");
-            figcaptionEl.innerHTML = source.innerHTML; 
-            figcaptionEl.classList.add("blockquote-footer");
-    
-            blockquotes[i].after(figcaptionEl);
-        }
-    }
-
-    var tables =  document.querySelectorAll('table');
-    for ( var i = 0; i < tables.length; i++) {
-        var tableWrapper = document.createElement('div');
-        tableWrapper.classList.add("table-responsive")
-        wrap(tables[i], tableWrapper);
-    }
+    document.querySelectorAll('blockquote .callout').forEach(function(el) {
+        el.parentElement.classList.add("callout");
+    })
 
 });
 

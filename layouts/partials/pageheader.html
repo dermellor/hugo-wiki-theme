@@ -1,0 +1,51 @@
+{{- $title := (.Title | markdownify) -}}
+
+
+{{- $title :=  (printf "%s %s %s" "<h1>" (.Title | markdownify)  "</h1>") | safeHTML -}}
+{{- $body := partial "content-wikilinks" . }}
+
+{{ if  strings.Contains .Content "h1" }}
+  {{- $title =  (printf "%s %s" (index (split .Content "</h1>") 0 ) "</h1>") | safeHTML -}}
+  {{- $body =  (index (split (partial "content-wikilinks" .) "</h1>") 1) | safeHTML }}
+{{ end }}
+
+<header class="{{if eq .Params.color "dark"}} bg-dark text-white pb-3 pb-lg-5 {{end}} {{if eq .Params.headerstyle "background"}} pb-lg-5 background-header {{ end }}" {{if eq .Params.headerstyle "background"}} style="background-image:url( {{ .Params.image}} ); " {{ end }}>
+    <div class="container-fluid px-lg-5">
+        <div class="row position-relative">
+            <div class="{{if eq .Params.headerstyle "background"}} col-12 col-xxl-8 offset-xxl-2 pt-3 p-lg-5 align-self-end bg-white {{ else if .Params.image}} col-lg-7 col-xxl-5 {{ else }} col-12 col-xxl-8 {{end}} offset-xxl-2  pt-3 pt-lg-5 align-self-end">
+                {{ $title }}
+                {{if .Params.teaser }}
+                  <p class="lead mt-auto pt-3">
+                    {{ .Params.teaser }}
+                  </p>
+                {{ else if .Params.description -}}
+                  <p class="lead mt-auto pt-3">
+                  {{ .Params.description }}
+                  </p>
+                {{- end }}
+                {{ if eq .Params.cta "newsletter" }}
+                  <div class="py-2">
+                    {{ partial "newsletter/form/form.html" (dict "size" "big" "utm_medium" "direct" ) }}
+                  </div>
+                {{ end }}
+            </div>
+            {{ if not (eq .Params.headerstyle "background") }} 
+                {{ if .Params.image}} 
+                <div class="col-lg-5 col-xxl-3 position-relative d-none d-lg-block" style="">
+                    <img class="img-fluid" src="{{ .Params.image}}"/>
+                </div>
+                {{ end }}
+            {{ end }}
+        </div>
+        {{if not (eq .Params.color "dark") }}
+            {{ if not .Params.image}} 
+                <div class="row">
+                <div class="col-12 col-xxl-8 offset-xxl-2">
+                    <hr/>
+                </div>
+                </div>
+            {{ end }}
+       {{ end }}
+  
+    </div>
+  </header>

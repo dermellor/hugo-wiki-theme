@@ -1,0 +1,221 @@
+{{ $firstBracket := "\\[\\[" }}
+{{ $lastBracket := "\\]\\]" }}
+
+{{ $wikiregex := "\\[\\[([^/]+?)\\]\\]" }}
+
+{{ $page := .Page }}
+
+{{ $wikilinks := .Content | findRE $wikiregex }}
+
+{{ $.Scratch.Set "content" .RawContent }}
+
+
+{{ $imagesRegex := "(!\\[.?\\]\\(.*\\))" }}
+{{ $images := .RawContent | findRE $imagesRegex }}
+
+{{ range first 1 $images }}
+	{{ $noteContent := replace ($.Scratch.Get "content") . ""  }}
+	{{ $.Scratch.Set "content" $noteContent }}
+{{ end }}
+
+
+{{ $wikiImagesRegex := "\\!\\[\\[([^/]+?)\\]\\]" }}
+{{ $wikiImages := .Content | findRE $wikiImagesRegex }}
+
+{{ range $wikiImages }}
+
+	{{ $content := . | replaceRE $wikiregex "$1" }}
+	{{ $alias := index ( last 1 ( split $content "|") ) 0 }}
+	{{ $fileName := index ( first 1 ( split $content "|") ) 0 }}
+	{{ $title := "" }}
+	{{ if ne $fileName $alias }}
+		{{ $title = $alias}}
+	{{ end }}
+
+	{{ $videoRegex := "mov" }}
+
+	{{ $videos := . | findRE $videoRegex }}
+
+	{{ if $videos }}
+		{{ $fileName = $fileName | replaceRE "\\!" "" }}
+		{{ $imageString := printf "%s%s%s%s%s" "<video controls ><source src='/Bilder/" $fileName "' type='video/mp4'/>" $title "</video>" }}
+
+		{{ $noteContent := replace ($.Scratch.Get "content") . $imageString }}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ else }}
+
+		{{ $fileName = $fileName | replaceRE "\\!" "" }}
+		{{ $fileName = $fileName | replaceRE "excalidraw" "excalidraw.png" }}
+		
+		{{ $imageString := printf "%s%s%s%s%s" "![](/Bilder/" $fileName " '" $title "')" }}
+
+		{{ $noteContent := replace ($.Scratch.Get "content") . $imageString }}
+		{{ $.Scratch.Set "content" $noteContent }}
+
+	{{end}}
+{{ end }}
+
+
+{{ range $wikilinks }}
+
+	
+	{{ $wikilink :=  . }}
+
+	{{ $link := "" }}
+
+	{{ $content := . | replaceRE $wikiregex "$1" }}
+
+	{{ $content := $content | replaceRE "\\?" "\\?" }}
+
+	{{ $content = index ( first 1 ( split $content "#") ) 0 }}
+
+	{{ $wikilink :=  printf "%s%s%s" "[[" $content "]]" }}
+	
+	{{ $fileName := index ( first 1 ( split $content "|") ) 0 }}
+
+	{{ $title := index ( last 1 ( split $content "|") ) 0 }}
+
+	{{ $post := print "/shorts/" $fileName ".md" }}
+	{{ if os.FileExists $post }}
+		{{ $link := "" }}
+
+		{{ with $page.GetPage $post}}
+
+			{{ if and (ne .Params.linkedin nil) ( ne .Params.linkedin "") }}
+				{{ $link = .Params.linkedin }}
+			{{ end}}
+			{{ if and (ne .Params.twitter nil) ( ne .Params.twitter "") }}
+				{{ $link = .Params.twitter }}
+			{{ end}}
+			{{ if and (ne .Params.youtube nil) ( ne .Params.youtube "") }}
+				{{ $link = .Params.youtube }}
+			{{ end}}
+			{{ if and (ne .Params.externalUrl nil) ( ne .Params.externalUrl "") }}
+				{{ $link = .Params.externalUrl }}
+			{{ end}}
+			{{ if and (ne .Params.distribution nil) ( in .Params.distribution "Blog") }}
+				{{ $link = relref $page $post }}
+			{{ end}}
+			{{ if eq $title $fileName }}
+				{{ $title = .Title }}
+			{{ end }}
+		{{ end }}
+		
+		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
+		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ end }}
+
+	{{ $post := print "/posts/" $fileName ".md" }}
+	{{ if os.FileExists $post }}
+		{{ $link := "" }}
+
+		{{ with $page.GetPage $post}}
+
+			{{ $link = relref $page $post }}
+			{{ if eq $title $fileName }}
+				{{ $title = .Title }}
+			{{ end }}
+		{{ end }}
+		
+		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
+		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ end }}
+
+	{{ $podcastTechIsGood := print "/podcast/tech-is-good/" $fileName ".md" }}
+	{{ if os.FileExists $podcastTechIsGood }}
+		{{ $link := "" }}
+
+		{{ with $page.GetPage $podcastTechIsGood}}
+
+			{{ $link = relref $page $podcastTechIsGood }}
+			{{ if eq $title $fileName }}
+				{{ $title = .Title }}
+			{{ end }}
+		{{ end }}
+		
+		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
+		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ end }}
+
+	{{ $podcastSkalierbar := print "/podcast/skalierbar/" $fileName ".md" }}
+	{{ if os.FileExists $podcastSkalierbar }}
+		{{ $link := "" }}
+
+		{{ with $page.GetPage $podcastSkalierbar}}
+
+			{{ $link = relref $page $podcastSkalierbar }}
+			{{ if eq $title $fileName }}
+				{{ $title = .Title }}
+			{{ end }}
+		{{ end }}
+		
+		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
+		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ end }}
+
+	{{ $article := print "/data/literature/articles/" $fileName ".md" }}
+	{{ if os.FileExists $article }}
+		{{ $link = findRESubmatch "\\[Web-URL\\]\\((.+?)\\)"  (os.ReadFile $article) 1 }}
+		{{ $link = index (index $link 0) 1 }}
+		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
+		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ end }}
+	
+	{{ $book := print "/data/literature/books/" $fileName ".md" }}
+	{{ if os.FileExists $book }}
+		{{ $link = findRESubmatch "\\[Web-URL\\]\\((.+?)\\)"  (os.ReadFile $book) 1 }}
+		{{ $link = index (index $link 0) 1 }}
+		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
+		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ end }}
+
+	{{ $index := print "/innovationslexikon/" $fileName ".md" }}
+	{{ if os.FileExists $index }}
+
+		{{ with $page.GetPage $index}}
+			{{ $link = relref $page $index }}
+		{{ end }}
+
+		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
+		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ end }}
+
+
+{{ end }}
+
+
+{{ range .Site.Params.content_filters }}
+	{{ $noteContent := replace ($.Scratch.Get "content") .search .replace  }}
+	{{ $.Scratch.Set "content" $noteContent }}
+{{ end }}
+
+
+{{ if findRE "include-html" .RawContent }}
+	{{ $content := (.Scratch.Get "content") |  markdownify }}
+	{{ $.Scratch.Set "content" $content }}
+
+	{{ $imagesRegex := "<img(.+)>" }}
+	{{ $images := $content | findRE $imagesRegex }}
+
+	{{ range first 1 $images }}
+		{{ $noteContent := replace ($.Scratch.Get "content") . ""  }}
+		{{ $.Scratch.Set "content" $noteContent }}
+	{{ end }}
+{{ end }}
+
+{{ $commentsRegex := "%%(.+)%%" }}
+{{ $comments := .Scratch.Get "content" | findRE $commentsRegex }}
+{{ range $comments }}
+	{{ $noteContent := replace ($.Scratch.Get "content") . ""  }}
+	{{ $.Scratch.Set "content" $noteContent }}
+{{ end }}
+
+{{ $content := .Scratch.Get "content" }}
+{{ $content |  markdownify }}

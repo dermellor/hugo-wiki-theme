@@ -2,23 +2,14 @@
 
 <article class="post row">
   
-    {{- with .Params.images -}}{{ range first 1 . }}
-    <div class="col-12 col-lg-6 col-xl-4 order-lg-last">
-        <div class="image" style="background-image: url( {{ . | absURL }})"></div>
-    </div>
-    {{- end -}}{{ end }}
-    
-    <div class="content col-12 col-lg-6 col-xl-5 offset-xl-3">
-      <header>    
+    <div class="col-12 col-lg-6 order-lg-last">
+      <a href='{{ .Permalink }}' class="article-illustration" style="background-image:url( {{ partial "article-image" . }} );">
+      </a>
+    </div>    
+    <div class="content col-12 col-lg-6">
         <h2 dir="auto"><a href="{{ .Permalink }}">{{ .Title | markdownify }}</a></h2>
-        
-        <div class="meta">
-          <p ><time {{ .Date.Format "2006-01-02T15:04:05Z07:00" | printf "datetime=%q" | safeHTMLAttr }}>{{ .Date.Format $dateFormat }}</time> {{ if or (.Params.categories) (.Params.tags) }} {{ i18n "postedIn" }} {{ partial "meta-terms.html" . }}{{ end }}</p>
-        </div>
-      </header>
-      
         {{ .Description }}
-        <a href='{{ .Permalink }}'>{{ i18n "readMore" }}</a>
+        <a href='{{ .Permalink }}'>{{ i18n "readMore" }}&nbsp;→</a>
   
     </div>
-  </article>
+</article>
