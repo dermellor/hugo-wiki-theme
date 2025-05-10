@@ -30,6 +30,63 @@
 
 {{ $js := resources.Get "js/transformations.js" }}
 
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.min.js"></script>
+<script>
+  // Initialize Supabase client - using v2 API
+  const supabaseClient = supabase.createClient(
+    'https://aknaekrnrbjpomkvzmri.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrbmFla3JucmJqcG9ta3Z6bXJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY3OTgyMzEsImV4cCI6MjA2MjM3NDIzMX0.XOymCaoOyOmb7okOLEtOXmMjOUPDB0VzZnWH0ckVeg8'
+  );
+
+  // Global variable to store session
+  window.supabaseSession = null;
+
+  // Set initial session
+  (async function() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    window.supabaseSession = session;
+  })();
+
+  // Flag, um zu verhindern, dass ensureUsernameExists mehrfach aufgerufen wird
+  let usernameCheckDone = false;
+
+  // Listen for auth changes
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    window.supabaseSession = session;
+
+    // Wenn eingeloggt, ensureUsernameExists aufrufen
+    if (session && event === 'SIGNED_IN' && !usernameCheckDone) {
+      usernameCheckDone = true;
+      // Verzögerung, um sicherzustellen, dass alles geladen ist
+      setTimeout(function() {
+        if (typeof ensureUsernameExists === 'function') {
+          ensureUsernameExists();
+        }
+      }, 500);
+    }
+
+    // Dispatch an event so other components can react
+    document.dispatchEvent(new CustomEvent('supabase-auth-change', {
+      detail: { event, session }
+    }));
+  });
+
+  // Expose supabaseClient globally so existing code works
+  window.supabaseClient = supabaseClient;
+
+  // Für bereits eingeloggte Benutzer beim Seitenaufruf
+  // Nur ausführen, wenn es nicht schon durch onAuthStateChange ausgelöst wurde
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      if (window.supabaseSession && typeof ensureUsernameExists === 'function' && !usernameCheckDone) {
+        usernameCheckDone = true;
+        ensureUsernameExists();
+      }
+    }, 500);
+  });
+</script>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js" integrity="sha512-7Pi/otdlbbCR+LnW+F7PwFcSDJOuUJB3OxtEHbg4vSMvzvJjde4Po1v4BR9Gdc9aXNUNFVUY+SK51wWT8WF0Gg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -39,8 +96,10 @@
 {{ $js := resources.Get "js/bounceback.min.js" | minify }}
 <script src="{{ $js.Permalink }}"></script>
 
-{{ $js := resources.Get "js/main.js" | minify }}
-<script src="{{ $js.Permalink }}"></script>
+{{ $main := resources.Get "js/main.js" | minify }}
+{{ $members := resources.Get "js/members.js" }}
+{{ $bundle := slice $main $members | resources.Concat "js/bundle.js" | minify }}
+<script src="{{ $bundle.Permalink }}"></script>
 
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script>

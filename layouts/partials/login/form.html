@@ -1,0 +1,139 @@
+{{/*
+  Login-Formular-Partial
+  Parameter:
+  - id: Die ID des Formulars (Standard: "login-form")
+  - email_id: Die ID des E-Mail-Eingabefeldes (Standard: "email")
+  - submit_id: Die ID des Submit-Buttons (Standard: "login-submit")
+  - result_id: Die ID des Ergebnis-Containers (Standard: "login-result")
+  - style: Style-Variante ("box" für dunklen Hintergrund)
+  - size: Größen-Variante ("big" für größere Elemente)
+  - cta: Text für den Call-to-Action Button
+*/}}
+
+{{ $id := .id | default "login-form" }}
+{{ $email_id := .email_id | default "email" }}
+{{ $submit_id := .submit_id | default "login-submit" }}
+{{ $result_id := .result_id | default "login-result" }}
+{{ $size := .size | default "" }}
+{{ $style := .style | default "" }}
+{{ $cta := .cta | default "Link erhalten" }}
+
+<div class="{{if eq $style "box"}} bg-dark text-white p-3{{end}}">
+  <form id="{{ $id }}" class="login-form" novalidate>
+    <div class="">
+      <div class="d-md-flex flex-row d-grid gap-3">
+        <div class="flex-grow-1">
+          <input type="email" class="form-control {{if eq $size "big"}} form-control-lg {{end}} {{if eq $style "box"}} border-0 {{else}} border-dark border-2 {{end}}" id="{{ $email_id }}" placeholder="E-Mail-Adresse" required>
+        </div>
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn {{if eq $style "box"}} btn-primary {{else}} btn-primary {{end}} {{if eq $size "big"}} btn-lg {{end}}" id="{{ $submit_id }}">{{ $cta }}</button>
+        </div>
+      </div>
+      <div id="{{ $result_id }}" class="mt-3 text-center" style="display: none;"></div>
+    </div>
+  </form>
+  <div class="mt-4">
+    <p class="small">
+      Nach dem Login-Versuch erhältst du eine E-Mail mit einem persönlichen Link. Klicke darauf, um dich anzumelden.
+      Mit der Anmeldung stimmst du unseren <a href="/datenschutz">Datenschutzbestimmungen</a> zu.
+    </p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('{{ $id }}');
+  const emailInput = document.getElementById('{{ $email_id }}');
+  const submitBtn = document.getElementById('{{ $submit_id }}');
+  const resultDiv = document.getElementById('{{ $result_id }}');
+
+  if (!form) return;
+
+  let isSubmitting = false;
+
+  form.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    // Einfache E-Mail-Validierung
+    if (!emailInput.value || !emailInput.value.includes('@')) {
+      if (resultDiv) {
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'mt-3 text-center alert alert-danger';
+        resultDiv.innerHTML = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+      }
+      return;
+    }
+
+    // Vermeiden von Doppel-Submits
+    if (isSubmitting) return;
+    isSubmitting = true;
+
+    // UI während des Sendens aktualisieren
+    submitBtn.disabled = true;
+    const originalButtonText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sende Link...';
+
+    if (resultDiv) {
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'mt-3 text-center alert alert-info';
+      resultDiv.innerHTML = 'E-Mail wird gesendet...';
+    }
+
+    // E-Mail-Adresse holen
+    const email = emailInput.value;
+
+    try {
+      // Supabase Login durchführen
+      if (typeof supabaseClient !== 'undefined') {
+        const { data, error } = await supabaseClient.auth.signInWithOtp({
+          email: email,
+          options: {
+            emailRedirectTo: window.location.origin
+          }
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        // Erfolgreiche Sendung anzeigen
+        if (resultDiv) {
+          resultDiv.className = 'mt-3 text-center alert alert-success';
+          resultDiv.innerHTML = 'Link wurde gesendet! Bitte prüfe deinen E-Mail-Eingang.';
+        }
+
+        // Formular zurücksetzen
+        form.reset();
+
+        // Event auslösen, falls externe Handler (z.B. für Modals) es abfangen möchten
+        document.dispatchEvent(new CustomEvent('login-success', {
+          detail: { formId: '{{ $id }}' }
+        }));
+      } else {
+        throw new Error('Supabase-Client nicht verfügbar');
+      }
+    } catch (error) {
+      console.error('Login-Fehler:', error);
+
+      // Fehler anzeigen
+      if (resultDiv) {
+        resultDiv.className = 'mt-3 text-center alert alert-danger';
+        resultDiv.innerHTML = 'Fehler: ' + (error.message || 'Unbekannter Fehler bei der Anmeldung.');
+      }
+
+      // Event auslösen für externe Handler
+      document.dispatchEvent(new CustomEvent('login-error', {
+        detail: {
+          formId: '{{ $id }}',
+          error: error
+        }
+      }));
+    } finally {
+      // Button zurücksetzen
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalButtonText;
+      isSubmitting = false;
+    }
+  });
+});
+</script>

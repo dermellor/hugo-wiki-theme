@@ -3,11 +3,7 @@
 {{$.Scratch.Set "isActive" true }}
 
 
-{{ if eq $type "GoogleAnalytics" }}    
-    {{ if not (.Site.GoogleAnalytics) }}
-        {{$.Scratch.Set "isActive" false }}
-    {{ end }}
-{{ end }}
+
 
 
 {{ if eq $type "Cookies" }}    

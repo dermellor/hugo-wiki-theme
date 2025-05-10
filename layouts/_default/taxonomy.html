@@ -14,6 +14,13 @@
                 {{ $pages := $pages | intersect (where .Site.RegularPages "Params.date" "!=" nil) }}
                 {{ $pages := $pages | intersect (where .Site.RegularPages "Language.Lang" .Site.Language.Lang) }}
                 
+                <!-- Handle Business & Strategy category special case -->
+                {{ if eq .Title "Business & Strategy" }}
+                  {{ $categoryName := .Title }}
+                  {{ $categoryPages := where .Site.RegularPages "Params.categories" "intersect" (slice $categoryName) }}
+                  {{ $pages = $categoryPages }}
+                {{ end }}
+                
             
                 {{ $paginator := .Paginate $pages.ByDate.Reverse }}
             
@@ -37,6 +44,7 @@
                 {{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
                     {{ partial "pagination.html" . }}
                 {{ end }}
+                </div>
             </div>
         </div>
       </section>

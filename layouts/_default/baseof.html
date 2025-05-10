@@ -25,7 +25,7 @@
       {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
     {{ end -}}
 
-    {{ template "_internal/google_analytics_async.html" . }}
+    {{ template "_internal/google_analytics.html" . }}
 
     {{ if .Site.Params.cookie_consent_info_url }}
     {{ partial "cookie-consent.html" . }}
@@ -139,6 +139,16 @@
                     <a class="nav-link px-2 text-white" href="{{ .url }}">{{ .title }}</a>
                   </li>
                 {{ end }}
+                <li class="nav-item">
+                  <a id="member-status" class="nav-link px-2 text-white" href="#"></a>
+                </li>
+                <script>
+                  document.addEventListener('DOMContentLoaded', function() {
+                    if (typeof renderMemberStatus === 'function') {
+                      renderMemberStatus();
+                    }
+                  });
+                </script>
     
               </ul>
             </div>
@@ -170,7 +180,74 @@
             <p>
               Der wöchentliche Aha-Moment für alle, die Innovation verstehen und vorantreiben wollen. Jeden Donnerstag in deinem Postfach.
             </p>
-            {{ partial "newsletter/form/minimal.html"  (dict "utm_medium" "modal" "size" "big") }}
+            {{ partial "newsletter/form/minimal.html"  (dict "utm_medium" "modal") }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" tabindex="-1" id="login-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Anmelden</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <p>Melde dich an, um Kommentare zu schreiben und an exklusiven Diskussionen teilzunehmen.</p>
+            
+            <!-- Wiederverwendbares Login-Formular-Partial -->
+            {{ partial "login/form.html" (dict "id" "login-modal-form" "email_id" "login-modal-email" "submit_id" "login-modal-submit" "result_id" "login-modal-result") }}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Modal Auto-Close nach erfolgreicher Anmeldung -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Event-Listener für erfolgreiche Anmeldung
+      document.addEventListener('login-success', function(event) {
+        if (event.detail.formId === 'login-modal-form') {
+          // Nach 3 Sekunden das Modal schließen
+          setTimeout(function() {
+            const loginModal = bootstrap.Modal.getInstance(document.getElementById('login-modal'));
+            if (loginModal) {
+              loginModal.hide();
+            }
+          }, 3000);
+        }
+      });
+    });
+    </script>
+
+    <!-- Username Modal -->
+    <div class="modal" tabindex="-1" id="username-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Wähle einen Benutzernamen</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Wähle einen eindeutigen Benutzernamen für dein Konto. Dieser wird bei allen deinen Kommentaren angezeigt.</p>
+
+            <form id="username-form" class="needs-validation" novalidate>
+              <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="username-input" placeholder="Benutzername" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_\-\.]+">
+                <label for="username-input">Benutzername</label>
+                <div class="invalid-feedback">
+                  Bitte gib einen gültigen Benutzernamen ein (mind. 3 Zeichen, nur Buchstaben, Zahlen, Unterstrich, Punkt und Bindestrich).
+                </div>
+              </div>
+
+              <div id="username-result" class="mt-3 text-center" style="display: none;"></div>
+
+              <div class="d-grid gap-2 mt-4">
+                <button type="submit" id="username-submit" class="btn btn-primary">Benutzername speichern</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
