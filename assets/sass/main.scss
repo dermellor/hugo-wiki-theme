@@ -4,6 +4,7 @@ $navbar-height: 0;
 @import "custom_variables";
 @import "../mellor-style/sass/main.scss";
 @import "bookshot.scss";
+@import "footnotes";
 @import "custom_styles";
 
 $enable-negative-margins: true;
@@ -271,9 +272,7 @@ audio::-webkit-media-controls-play-button,
 
 
 
-
 article figure:not(:has(figcaption:empty)) {
-    @extend .margin-box;
     figcaption {
         font-size: $small-font-size;
         padding:0.5rem;
@@ -289,9 +288,7 @@ article figure:not(:has(figcaption:empty)) {
     }
 }
 
-.callout {
-    @extend .margin-box;
-    border: 2px solid $dark;
+article .callout {
     margin-bottom: 1rem;
     p {
         font-size: $font-size-base;
@@ -301,16 +298,6 @@ article figure:not(:has(figcaption:empty)) {
         @include media-breakpoint-down(lg) {
             padding:0;
         }
-    }
-}
-
-.callout, article figure:not(:has(figcaption:empty))  {
-    &:nth-child(odd):not(.margin-box-left) {
-        @extend .margin-box-right;
-
-    }
-    &:nth-child(even):not(.margin-box-right) {
-        @extend .margin-box-left;
     }
 }
 
@@ -376,7 +363,6 @@ article figure:not(:has(figcaption:empty)) {
         }
     }
 }
-
 
 nav {
     .navbar-brand {
@@ -449,5 +435,60 @@ nav {
     }
 }
 
+// Social Login Buttons Styling
+.social-login-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 1.5rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+}
+
+#linkedin-login {
+  &:hover {
+    background-color: #0077b5;
+    color: white;
+  }
+}
+
+#google-login {
+  &:hover {
+    background-color: #db4437;
+    color: white;
+  }
+}
+
+#apple-login {
+  &:hover {
+    background-color: #000;
+    color: white;
+  }
+}
+
+#slack-login {
+  &:hover {
+    background-color: #2eb886;
+    color: white;
+  }
+}
+
+.buy-me-a-coffee-banner {
+    a {
+        text-decoration: none;
+        color: $dark;
+    }
+}
 
 

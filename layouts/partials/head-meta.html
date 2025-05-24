@@ -48,43 +48,18 @@
     window.supabaseSession = session;
   })();
 
-  // Flag, um zu verhindern, dass ensureUsernameExists mehrfach aufgerufen wird
-  let usernameCheckDone = false;
-
-  // Listen for auth changes
+  // Auth State Change-Event für die alte Kompatibilität
   supabaseClient.auth.onAuthStateChange((event, session) => {
     window.supabaseSession = session;
 
-    // Wenn eingeloggt, ensureUsernameExists aufrufen
-    if (session && event === 'SIGNED_IN' && !usernameCheckDone) {
-      usernameCheckDone = true;
-      // Verzögerung, um sicherzustellen, dass alles geladen ist
-      setTimeout(function() {
-        if (typeof ensureUsernameExists === 'function') {
-          ensureUsernameExists();
-        }
-      }, 500);
-    }
-
-    // Dispatch an event so other components can react
+    // Event für ältere Komponenten weiterleiten
     document.dispatchEvent(new CustomEvent('supabase-auth-change', {
       detail: { event, session }
     }));
   });
 
-  // Expose supabaseClient globally so existing code works
+  // Supabase-Client global verfügbar machen
   window.supabaseClient = supabaseClient;
-
-  // Für bereits eingeloggte Benutzer beim Seitenaufruf
-  // Nur ausführen, wenn es nicht schon durch onAuthStateChange ausgelöst wurde
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-      if (window.supabaseSession && typeof ensureUsernameExists === 'function' && !usernameCheckDone) {
-        usernameCheckDone = true;
-        ensureUsernameExists();
-      }
-    }, 500);
-  });
 </script>
 
 
@@ -96,9 +71,14 @@
 {{ $js := resources.Get "js/bounceback.min.js" | minify }}
 <script src="{{ $js.Permalink }}"></script>
 
-{{ $main := resources.Get "js/main.js" | minify }}
+{{ $main := resources.Get "js/main.js" }}
 {{ $members := resources.Get "js/members.js" }}
-{{ $bundle := slice $main $members | resources.Concat "js/bundle.js" | minify }}
+{{ $alpine := resources.Get "js/alpineComponents.js" }}
+{{ $inlineFootnotes := resources.Get "js/inlineFootnotes.js" }}
+{{ $marginBox := resources.Get "js/margin-box.js" }}
+{{ $grabacoffee := resources.Get "js/grabacoffee.js" }}
+
+{{ $bundle := slice $main $members $alpine $inlineFootnotes $marginBox $grabacoffee | resources.Concat "js/bundle.js" | minify }}
 <script src="{{ $bundle.Permalink }}"></script>
 
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
@@ -110,5 +90,8 @@
     }
   };
 </script>
+
+<!-- Alpine.js für reaktive UI-Komponenten -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js"></script>
 
 

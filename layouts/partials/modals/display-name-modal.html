@@ -1,0 +1,101 @@
+<!-- Display Name Modal mit Alpine.js -->
+<div 
+  x-data="{ 
+    displayName: $store.auth.user?.user_metadata?.display_name || '', 
+    isSubmitting: false,
+    resultMessage: '',
+    resultType: 'info',
+    showResult: false
+  }"
+  x-show="$store.auth.showDisplayNameModal"
+  x-on:keydown.escape.window="$store.auth.showDisplayNameModal = false"
+  class="modal fade"
+  tabindex="-1"
+  style="display: none;"
+  :class="{ 'show d-block': $store.auth.showDisplayNameModal }"
+>
+  <div class="modal-dialog" x-on:click.outside="$store.auth.showDisplayNameModal = false">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Wähle einen Display Name</h5>
+        <button type="button" class="btn-close" aria-label="Close" @click="$store.auth.showDisplayNameModal = false"></button>
+      </div>
+      <div class="modal-body">
+        <p>Wähle einen Display Name für dein Konto. Dieser wird bei allen deinen Interaktionen angezeigt.</p>
+
+        <form 
+          @submit.prevent="
+            isSubmitting = true;
+            $store.auth.saveDisplayName(displayName)
+              .then(success => {
+                showResult = true;
+                if (success) {
+                  resultType = 'success';
+                  resultMessage = 'Display Name erfolgreich gespeichert!';
+                  
+                  // Modal nach 2 Sekunden schließen
+                  setTimeout(() => {
+                    $store.auth.showDisplayNameModal = false;
+                  }, 2000);
+                } else {
+                  resultType = 'danger';
+                  resultMessage = 'Fehler beim Speichern des Display Names.';
+                }
+              })
+              .finally(() => {
+                isSubmitting = false;
+              })
+          "
+          class="needs-validation"
+          novalidate
+        >
+          <div class="form-floating mb-3">
+            <input 
+              type="text" 
+              class="form-control" 
+              id="display-name-input" 
+              placeholder="Display Name" 
+              x-model="displayName"
+              x-init="$nextTick(() => { 
+                $el.focus();
+                $el.select();
+              })"
+              required 
+              minlength="2" 
+              maxlength="50"
+            >
+            <label for="display-name-input">Display Name</label>
+            <div class="invalid-feedback">
+              Bitte gib einen gültigen Display Namen ein (mindestens 2 Zeichen).
+            </div>
+          </div>
+
+          <div 
+            x-show="showResult"
+            x-transition
+            class="mt-3 text-center alert" 
+            :class="'alert-' + resultType"
+            x-text="resultMessage"
+          ></div>
+
+          <div class="d-grid gap-2 mt-4">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              :disabled="isSubmitting || displayName.length < 2"
+              x-html="isSubmitting ? '<span class=\'spinner-border spinner-border-sm\' role=\'status\' aria-hidden=\'true\'></span> Speichere...' : 'Display Name speichern'"
+            ></button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hintergrund-Overlay -->
+<div 
+  x-show="$store.auth.showDisplayNameModal" 
+  x-transition.opacity 
+  class="modal-backdrop fade show"
+  x-on:click="$store.auth.showDisplayNameModal = false"
+></div>

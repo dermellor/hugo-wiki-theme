@@ -1,139 +1,111 @@
 {{/*
-  Login-Formular-Partial
+  Login-Formular-Partial mit Alpine.js
   Parameter:
-  - id: Die ID des Formulars (Standard: "login-form")
-  - email_id: Die ID des E-Mail-Eingabefeldes (Standard: "email")
-  - submit_id: Die ID des Submit-Buttons (Standard: "login-submit")
-  - result_id: Die ID des Ergebnis-Containers (Standard: "login-result")
+  - intro: Der Einführungstext (Standard: "Melde dich an, um Kommentare zu schreiben und an exklusiven Diskussionen teilzunehmen.")
+  - cta: Text für den Call-to-Action Button (Standard: "Link erhalten")
   - style: Style-Variante ("box" für dunklen Hintergrund)
-  - size: Größen-Variante ("big" für größere Elemente)
-  - cta: Text für den Call-to-Action Button
 */}}
 
-{{ $id := .id | default "login-form" }}
-{{ $email_id := .email_id | default "email" }}
-{{ $submit_id := .submit_id | default "login-submit" }}
-{{ $result_id := .result_id | default "login-result" }}
-{{ $size := .size | default "" }}
-{{ $style := .style | default "" }}
+{{ $intro := .intro | default "Melde dich an, um Kommentare zu schreiben und an exklusiven Diskussionen teilzunehmen." }}
 {{ $cta := .cta | default "Link erhalten" }}
+{{ $style := .style | default "" }}
 
-<div class="{{if eq $style "box"}} bg-dark text-white p-3{{end}}">
-  <form id="{{ $id }}" class="login-form" novalidate>
+<!-- Alpine.js Login Formular mit supabaseAuth Komponente -->
+<div
+  x-data="supabaseAuth()"
+  class="{{if eq $style "box"}} bg-dark text-white p-3{{end}}"
+>
+  <p>{{ $intro }}</p>
+
+  <!-- Login-Formular -->
+  <form class="login-form" @submit.prevent="loginWithEmail(email)" novalidate>
     <div class="">
       <div class="d-md-flex flex-row d-grid gap-3">
         <div class="flex-grow-1">
-          <input type="email" class="form-control {{if eq $size "big"}} form-control-lg {{end}} {{if eq $style "box"}} border-0 {{else}} border-dark border-2 {{end}}" id="{{ $email_id }}" placeholder="E-Mail-Adresse" required>
+          <input type="email" class="form-control border-dark border-2"
+                 x-model="email"
+                 placeholder="E-Mail-Adresse"
+                 @focus="$nextTick(() => $el.select())"
+                 required>
         </div>
         <div class="d-grid gap-2">
-          <button type="submit" class="btn {{if eq $style "box"}} btn-primary {{else}} btn-primary {{end}} {{if eq $size "big"}} btn-lg {{end}}" id="{{ $submit_id }}">{{ $cta }}</button>
+          <button type="submit" class="btn btn-primary"
+            :disabled="isLoading || !email?.includes('@')"
+            x-html="isLoading ? '<span class=\'spinner-border spinner-border-sm\' role=\'status\' aria-hidden=\'true\'></span> Sende Link...' : '{{ $cta }}'"
+          >{{ $cta }}</button>
         </div>
       </div>
-      <div id="{{ $result_id }}" class="mt-3 text-center" style="display: none;"></div>
+
+      <!-- Error message -->
+      <div
+        x-show="loginError"
+        x-transition
+        class="mt-3 text-center alert alert-danger"
+        x-text="loginError"
+      ></div>
+
+      <!-- Success message -->
+      <div
+        x-show="successMessage"
+        x-transition
+        class="mt-3 text-center alert alert-success"
+        x-text="successMessage"
+      ></div>
+
+      <!-- Social Login Buttons -->
+      <div class="mt-3">
+        <div class="text-center mb-2">
+          <span class="text-muted">Oder anmelden mit</span>
+        </div>
+        <div class="d-flex justify-content-center gap-2">
+          <!-- LinkedIn Button -->
+          <button type="button" class="btn btn-outline-primary social-login-btn"
+                  aria-label="Mit LinkedIn anmelden"
+                  @click.prevent="loginWithProvider('linkedin_oidc')"
+                  :disabled="isSocialLoginLoading"
+                  :class="{'opacity-50': isSocialLoginLoading && socialLoginProvider != 'linkedin_oidc'}">
+            <template x-if="isSocialLoginLoading && socialLoginProvider == 'linkedin_oidc'">
+              <span class="spinner-border spinner-border-sm" role="status"></span>
+            </template>
+            <template x-if="!(isSocialLoginLoading && socialLoginProvider == 'linkedin_oidc')">
+              <i class="bi bi-linkedin"></i>
+            </template>
+          </button>
+          
+          <!-- Google Button -->
+          <button type="button" class="btn btn-outline-danger social-login-btn"
+                  aria-label="Mit Google anmelden"
+                  @click.prevent="loginWithProvider('google')"
+                  :disabled="isSocialLoginLoading"
+                  :class="{'opacity-50': isSocialLoginLoading && socialLoginProvider != 'google'}">
+            <template x-if="isSocialLoginLoading && socialLoginProvider == 'google'">
+              <span class="spinner-border spinner-border-sm" role="status"></span>
+            </template>
+            <template x-if="!(isSocialLoginLoading && socialLoginProvider == 'google')">
+              <i class="bi bi-google"></i>
+            </template>
+          </button>
+          
+          <!-- Slack Button -->
+          <button type="button" class="btn btn-outline-success social-login-btn"
+                  aria-label="Mit Slack anmelden"
+                  @click.prevent="loginWithProvider('slack_oidc')"
+                  :disabled="isSocialLoginLoading"
+                  :class="{'opacity-50': isSocialLoginLoading && socialLoginProvider != 'slack_oidc'}">
+            <template x-if="isSocialLoginLoading && socialLoginProvider == 'slack_oidc'">
+              <span class="spinner-border spinner-border-sm" role="status"></span>
+            </template>
+            <template x-if="!(isSocialLoginLoading && socialLoginProvider == 'slack_oidc')">
+              <i class="bi bi-slack"></i>
+            </template>
+          </button>
+        </div>
+      </div>
     </div>
   </form>
   <div class="mt-4">
     <p class="small">
-      Nach dem Login-Versuch erhältst du eine E-Mail mit einem persönlichen Link. Klicke darauf, um dich anzumelden.
       Mit der Anmeldung stimmst du unseren <a href="/datenschutz">Datenschutzbestimmungen</a> zu.
     </p>
   </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.getElementById('{{ $id }}');
-  const emailInput = document.getElementById('{{ $email_id }}');
-  const submitBtn = document.getElementById('{{ $submit_id }}');
-  const resultDiv = document.getElementById('{{ $result_id }}');
-
-  if (!form) return;
-
-  let isSubmitting = false;
-
-  form.addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    // Einfache E-Mail-Validierung
-    if (!emailInput.value || !emailInput.value.includes('@')) {
-      if (resultDiv) {
-        resultDiv.style.display = 'block';
-        resultDiv.className = 'mt-3 text-center alert alert-danger';
-        resultDiv.innerHTML = 'Bitte gib eine gültige E-Mail-Adresse ein.';
-      }
-      return;
-    }
-
-    // Vermeiden von Doppel-Submits
-    if (isSubmitting) return;
-    isSubmitting = true;
-
-    // UI während des Sendens aktualisieren
-    submitBtn.disabled = true;
-    const originalButtonText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sende Link...';
-
-    if (resultDiv) {
-      resultDiv.style.display = 'block';
-      resultDiv.className = 'mt-3 text-center alert alert-info';
-      resultDiv.innerHTML = 'E-Mail wird gesendet...';
-    }
-
-    // E-Mail-Adresse holen
-    const email = emailInput.value;
-
-    try {
-      // Supabase Login durchführen
-      if (typeof supabaseClient !== 'undefined') {
-        const { data, error } = await supabaseClient.auth.signInWithOtp({
-          email: email,
-          options: {
-            emailRedirectTo: window.location.origin
-          }
-        });
-
-        if (error) {
-          throw error;
-        }
-
-        // Erfolgreiche Sendung anzeigen
-        if (resultDiv) {
-          resultDiv.className = 'mt-3 text-center alert alert-success';
-          resultDiv.innerHTML = 'Link wurde gesendet! Bitte prüfe deinen E-Mail-Eingang.';
-        }
-
-        // Formular zurücksetzen
-        form.reset();
-
-        // Event auslösen, falls externe Handler (z.B. für Modals) es abfangen möchten
-        document.dispatchEvent(new CustomEvent('login-success', {
-          detail: { formId: '{{ $id }}' }
-        }));
-      } else {
-        throw new Error('Supabase-Client nicht verfügbar');
-      }
-    } catch (error) {
-      console.error('Login-Fehler:', error);
-
-      // Fehler anzeigen
-      if (resultDiv) {
-        resultDiv.className = 'mt-3 text-center alert alert-danger';
-        resultDiv.innerHTML = 'Fehler: ' + (error.message || 'Unbekannter Fehler bei der Anmeldung.');
-      }
-
-      // Event auslösen für externe Handler
-      document.dispatchEvent(new CustomEvent('login-error', {
-        detail: {
-          formId: '{{ $id }}',
-          error: error
-        }
-      }));
-    } finally {
-      // Button zurücksetzen
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalButtonText;
-      isSubmitting = false;
-    }
-  });
-});
-</script>

@@ -8,10 +8,14 @@ $orange: #FFA800;
 $orange-500: $orange;
 $orange-400: #E8AC68 ;
 $orange-300: #F4D5B4;
+$orange-200: #F5E3CF;
 
 $pink: #F32ED4;
 $green: #94D825;
 $gray-800: #2C3333;
+$info: $purple;
+$secondary: #F9F9F9;
+$danger: $pink;
 
 
 $link-hover-color: #E99842;    
@@ -22,6 +26,7 @@ $danger: red;
 $dark: $purple;
 $light: #F9F9F9;
 $body-color: $purple;
+$mark-bg: $orange-200;
 
 $navbar-height: 4rem;
 $navbar-dark-hover-color: $white;
@@ -66,3 +71,5 @@ $container-max-widths: (
   xxxl: 1600px,
   wide: 2200px
 );
+
+$enable-negative-margins: true;

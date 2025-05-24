@@ -1,7 +1,7 @@
 {{ $firstBracket := "\\[\\[" }}
 {{ $lastBracket := "\\]\\]" }}
 
-{{ $wikiregex := "\\[\\[([^/]+?)\\]\\]" }}
+{{ $wikiregex := "\\[\\[([^\\]]+?)\\]\\]" }}
 
 {{ $page := .Page }}
 
@@ -59,23 +59,27 @@
 {{ range $wikilinks }}
 
 	
-	{{ $wikilink :=  . }}
+	{{ $originalWikilink := . }}
 
 	{{ $link := "" }}
 
 	{{ $content := . | replaceRE $wikiregex "$1" }}
-
-	{{ $content := $content | replaceRE "\\?" "\\?" }}
-
+	
 	{{ $content = index ( first 1 ( split $content "#") ) 0 }}
 
-	{{ $wikilink :=  printf "%s%s%s" "[[" $content "]]" }}
+	{{ $wikilink := $originalWikilink }}
 	
-	{{ $fileName := index ( first 1 ( split $content "|") ) 0 }}
+	{{ $fullFileName := index ( first 1 ( split $content "|") ) 0 }}
 
 	{{ $title := index ( last 1 ( split $content "|") ) 0 }}
+	
+	{{ $fileName := $fullFileName }}
 
 	{{ $post := print "/shorts/" $fileName ".md" }}
+	{{ if not (os.FileExists $post) }}
+		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
+		{{ $post = print "/shorts/" $fileNameSanitized ".md" }}
+	{{ end }}
 	{{ if os.FileExists $post }}
 		{{ $link := "" }}
 
@@ -94,7 +98,7 @@
 				{{ $link = .Params.externalUrl }}
 			{{ end}}
 			{{ if and (ne .Params.distribution nil) ( in .Params.distribution "Blog") }}
-				{{ $link = relref $page $post }}
+				{{ $link = .Permalink }}
 			{{ end}}
 			{{ if eq $title $fileName }}
 				{{ $title = .Title }}
@@ -107,12 +111,15 @@
 	{{ end }}
 
 	{{ $post := print "/posts/" $fileName ".md" }}
+	{{ if not (os.FileExists $post) }}
+		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
+		{{ $post = print "/posts/" $fileNameSanitized ".md" }}
+	{{ end }}
 	{{ if os.FileExists $post }}
 		{{ $link := "" }}
 
 		{{ with $page.GetPage $post}}
-
-			{{ $link = relref $page $post }}
+			{{ $link = .Permalink }}
 			{{ if eq $title $fileName }}
 				{{ $title = .Title }}
 			{{ end }}
@@ -124,12 +131,15 @@
 	{{ end }}
 
 	{{ $podcastTechIsGood := print "/podcast/tech-is-good/" $fileName ".md" }}
+	{{ if not (os.FileExists $podcastTechIsGood) }}
+		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
+		{{ $podcastTechIsGood = print "/podcast/tech-is-good/" $fileNameSanitized ".md" }}
+	{{ end }}
 	{{ if os.FileExists $podcastTechIsGood }}
 		{{ $link := "" }}
 
 		{{ with $page.GetPage $podcastTechIsGood}}
-
-			{{ $link = relref $page $podcastTechIsGood }}
+			{{ $link = .Permalink }}
 			{{ if eq $title $fileName }}
 				{{ $title = .Title }}
 			{{ end }}
@@ -141,12 +151,15 @@
 	{{ end }}
 
 	{{ $podcastSkalierbar := print "/podcast/skalierbar/" $fileName ".md" }}
+	{{ if not (os.FileExists $podcastSkalierbar) }}
+		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
+		{{ $podcastSkalierbar = print "/podcast/skalierbar/" $fileNameSanitized ".md" }}
+	{{ end }}
 	{{ if os.FileExists $podcastSkalierbar }}
 		{{ $link := "" }}
 
 		{{ with $page.GetPage $podcastSkalierbar}}
-
-			{{ $link = relref $page $podcastSkalierbar }}
+			{{ $link = .Permalink }}
 			{{ if eq $title $fileName }}
 				{{ $title = .Title }}
 			{{ end }}
@@ -158,6 +171,10 @@
 	{{ end }}
 
 	{{ $article := print "/data/literature/articles/" $fileName ".md" }}
+	{{ if not (os.FileExists $article) }}
+		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
+		{{ $article = print "/data/literature/articles/" $fileNameSanitized ".md" }}
+	{{ end }}
 	{{ if os.FileExists $article }}
 		{{ $link = findRESubmatch "\\[Web-URL\\]\\((.+?)\\)"  (os.ReadFile $article) 1 }}
 		{{ $link = index (index $link 0) 1 }}
@@ -167,6 +184,10 @@
 	{{ end }}
 	
 	{{ $book := print "/data/literature/books/" $fileName ".md" }}
+	{{ if not (os.FileExists $book) }}
+		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
+		{{ $book = print "/data/literature/books/" $fileNameSanitized ".md" }}
+	{{ end }}
 	{{ if os.FileExists $book }}
 		{{ $link = findRESubmatch "\\[Web-URL\\]\\((.+?)\\)"  (os.ReadFile $book) 1 }}
 		{{ $link = index (index $link 0) 1 }}
@@ -176,10 +197,14 @@
 	{{ end }}
 
 	{{ $index := print "/innovationslexikon/" $fileName ".md" }}
+	{{ if not (os.FileExists $index) }}
+		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
+		{{ $index = print "/innovationslexikon/" $fileNameSanitized ".md" }}
+	{{ end }}
 	{{ if os.FileExists $index }}
 
 		{{ with $page.GetPage $index}}
-			{{ $link = relref $page $index }}
+			{{ $link = .Permalink }}
 		{{ end }}
 
 		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}

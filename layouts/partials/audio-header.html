@@ -1,8 +1,12 @@
 {{ if .file }}
-
+    {{ $audioFile := .file }}
+    {{ if reflect.IsSlice .file }}
+        {{ $audioFile = index .file 0 }}
+    {{ end }}
+    
     <div class="d-flex flex-row align-items-end">
         <audio controls preload="true" class="">
-            <source src="{{ .file }}" type="audio/mpeg">
+            <source src="{{ $audioFile }}" type="audio/mpeg">
         </audio>
         {{ if .spotify }}
             <a href="{{ .spotify }}" role="button" class="btn btn-square-md mx-2 my-auto">
@@ -14,7 +18,6 @@
             <i class="bi-apple"></i>
             Itunes
         </a>
-    {{ end }}
+        {{ end }}
     </div>
-
 {{ end }}

@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function(){
         keyboard: true
     })
 
-    const blogPost = document.querySelector('article.blog-post.posts');
+    const blogPost = document.querySelector('article.blog-post');
 
     document.querySelectorAll(".subscribe-newsletter").forEach(element => {
       element.addEventListener("click", showNewsletterModal);
