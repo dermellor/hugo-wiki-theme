@@ -51,38 +51,66 @@ h1, h2, h3, h4, h5, h6, p, div, a, li, sup {
 
 
 
+%section-title-highlight {
+    display: inline-block;
+    position: relative;
+    &:after {
+        content: "";
+        width: 100%;
+        height: 1.025em;
+        border-bottom: 0.35em solid $orange-400;
+        display: inline;
+        left: 0;
+        position: absolute;
+        z-index: -1;
+    }
+}
+
+%section-title-highlight-display-1 {
+    @extend %section-title-highlight;
+    line-height: 1.05em;
+    &:after {
+        border-bottom-width: 0.225em;
+    }
+}
 
 .section-title {
     font-weight: 500;
-    //border-bottom: 0.35em solid $orange-400; /* Unterstrichene Linie */
     line-height: 1em;
-    display:table;
+    display: table;
     margin-top: 0.4em;
-    position:relative;
-    z-index:2;
-    &:after {
-        content: "";
-        width:100%;
-        height: 1.025em;
-        border-bottom: 0.35em solid $orange-400; /* Unterstrichene Linie */
-        display:block;
-        top:0;
-        position:absolute;
-        z-index:-1;
-    }
-    &.display-1 {
-        text-transform: uppercase;
-        &:after {
-            border-bottom-width: 0.225em;
+    z-index: 2;
+    
+    &:has(strong) {
+        strong {
+            @extend %section-title-highlight;
         }
     }
+    &:not(:has(strong)) {
+        @extend %section-title-highlight;
+    }
+
+    &.display-1 {
+        
+        &:has(strong) {
+            strong {
+                @extend %section-title-highlight-display-1;
+            }
+        }
+        &:not(:has(strong)) {
+            @extend %section-title-highlight-display-1;
+        }
+    }
+    
     & .display-5 {
-        line-height:0.35em;
+        line-height: 0.35em;
     }
     & .display-6 {
-        line-height:0.35em;
+        line-height: 0.35em;
     }
 }
+
+
 
 .page {
     .single-page h2 {
