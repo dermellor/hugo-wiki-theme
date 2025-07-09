@@ -8,18 +8,20 @@
 {{ if templates.Exists ( printf "partials/%s.html" $partialPath ) }}
   {{ partial $partialPath . }}
 {{ else }}
-    <article class="post row">
-        <div class="col-12 col-lg-6 col-xl-4 order-lg-last">
-            <a href='{{ .Permalink }}'></a>
-        </div>    
-        <div class="content col-12 col-lg-6 col-xl-5 offset-xl-3">
-            <header>    
-                <h2 dir="auto"><a href="{{ .Permalink }}">{{default .Title (.File.BaseFileName | humanize | title) }}</a></h2>
-            </header>
-            {{ .Description }}
-            <a href='{{ .Permalink }}'>{{ i18n "readMore" }}&nbsp;→</a>
-        </div>
-    </article>
+    <div class="col-12">
+        <article class="post row">
+            <div class="col-12 col-lg-6 col-xl-4 order-lg-last">
+                <a href='{{ .Permalink }}'></a>
+            </div>    
+            <div class="content col-12 col-lg-6 col-xl-5 offset-xl-3">
+                <header>    
+                    <h2 dir="auto"><a href="{{ .Permalink }}">{{default .Title (.File.BaseFileName | humanize | title) }}</a></h2>
+                </header>
+                {{ .Description }}
+                <a href='{{ .Permalink }}'>{{ i18n "readMore" }}&nbsp;→</a>
+            </div>
+        </article>
+    </div>
 {{ end }}
 
 

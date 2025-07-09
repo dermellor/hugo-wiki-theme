@@ -1,15 +1,17 @@
 {{ $dateFormat := default "Mon Jan 2, 2006" (index .Site.Params "date_format") }}
 
-<article class="post row">
-  
-    <div class="col-12 col-lg-6 order-lg-last">
-      <a href='{{ .Permalink }}' class="article-illustration" style="background-image:url( {{ partial "article-image" . }} );">
-      </a>
-    </div>    
-    <div class="content col-12 col-lg-6">
-        <h2 dir="auto"><a href="{{ .Permalink }}">{{ .Title | markdownify }}</a></h2>
-        {{ .Description }}
-        <a href='{{ .Permalink }}'>{{ i18n "readMore" }}&nbsp;→</a>
-  
-    </div>
-</article>
+<div class="col-12">
+  <article class="post row py-3">
+    
+      <div class="col-12 col-lg-6 order-lg-last">
+        <a href='{{ .Permalink }}' class="article-illustration" style="background-image:url( {{ partial "article-image" . }} );">
+        </a>
+      </div>    
+      <div class="content col-12 col-lg-6">
+          <h2 dir="auto"><a href="{{ .Permalink }}">{{ .Title | markdownify }}</a></h2>
+          {{ .Description }}
+          <a href='{{ .Permalink }}'>{{ i18n "readMore" }}&nbsp;→</a>
+
+      </div>
+  </article>
+</div>

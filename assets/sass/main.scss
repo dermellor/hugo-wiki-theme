@@ -374,6 +374,14 @@ article .callout {
 
 }
 
+.row.shorts {
+    @extend .margin-box;
+    @extend .margin-box-right;
+    background: $light;
+    padding:1em;
+    padding-top:3em;
+}
+
 .category {
     a {
         border-width: 2px;

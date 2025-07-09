@@ -1,53 +1,75 @@
 {{ define "main" }}
 
-    {{ partial "pageheader.html"  . }}
+   {{ partial "pageheader.html"  . }}
 
+   <section class="journal py-5 p-lg-5">
+       <div class="container-fluid">
+           <div class="row">
+               <div class="col-12 col-xxl-6 offset-xxl-2">
+     
+               {{ $truncate := default true .Site.Params.truncate }}
+               
+               {{ $pages := .Pages }}
+               {{ $pages := $pages | intersect (where .Site.RegularPages "Params.date" "!=" nil) }}
+               {{ $pages := $pages | intersect (where .Site.RegularPages "Language.Lang" .Site.Language.Lang) }}
+               
+               <!-- Handle Business & Strategy category special case -->
+               {{ if eq .Title "Business & Strategy" }}
+                 {{ $categoryName := .Title }}
+                 {{ $categoryPages := where .Site.RegularPages "Params.categories" "intersect" (slice $categoryName) }}
+                 {{ $pages = $categoryPages }}
+               {{ end }}
+               
+               {{ $paginator := .Paginate $pages.ByDate.Reverse 30 }}
 
-    <section class="journal py-5 p-lg-5">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 col-xxl-8 offset-xxl-2">
-      
-                {{ $truncate := default true .Site.Params.truncate }}
-                
-                {{ $pages := .Pages }}
-                {{ $pages := $pages | intersect (where .Site.RegularPages "Params.date" "!=" nil) }}
-                {{ $pages := $pages | intersect (where .Site.RegularPages "Language.Lang" .Site.Language.Lang) }}
-                
-                <!-- Handle Business & Strategy category special case -->
-                {{ if eq .Title "Business & Strategy" }}
-                  {{ $categoryName := .Title }}
-                  {{ $categoryPages := where .Site.RegularPages "Params.categories" "intersect" (slice $categoryName) }}
-                  {{ $pages = $categoryPages }}
-                {{ end }}
-                
-            
-                {{ $paginator := .Paginate $pages.ByDate.Reverse }}
-            
-            
-                {{ $lastPost := index (last 1 $paginator.Pages) 0 }}
-
-                {{ range $paginator.Pages }}
-                    {{ if $truncate }}
-                        {{ .Render "summary" }}
-                    {{ else }}
-                        {{ .Render "content" }}
-                    {{ end }}
-
-                    {{ if not (eq $lastPost.Permalink .Permalink) }} 
-                        <hr class="py-3"/>
-                    {{ end }}
-
-                {{ end }}
-                
-            
-                {{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
-                    {{ partial "pagination.html" . }}
-                {{ end }}
-                </div>
-            </div>
-        </div>
-      </section>
+               {{ range $index, $page := $paginator.Pages }}
+                   {{ $currentType := $page.Type }}
+                   {{ $prevType := "" }}
+                   {{ $nextType := "" }}
+                   
+                   <!-- Previous type bestimmen -->
+                   {{ if gt $index 0 }}
+                       {{ $prevIndex := sub $index 1 }}
+                       {{ $prevPage := index $paginator.Pages $prevIndex }}
+                       {{ $prevType = $prevPage.Type }}
+                   {{ end }}
+                   
+                   <!-- Next type bestimmen -->
+                   {{ $nextIndex := add $index 1 }}
+                   {{ if lt $nextIndex (len $paginator.Pages) }}
+                       {{ $nextPage := index $paginator.Pages $nextIndex }}
+                       {{ $nextType = $nextPage.Type }}
+                   {{ end }}
+                   
+                   <!-- Wrapper öffnen wenn Type wechselt oder erster Entry -->
+                   {{ if or (eq $index 0) (ne $currentType $prevType) }}
+                       <div class="row {{ $currentType }} py-3">
+                        {{ if eq $currentType "shorts"}} 
+                            <h5>Notizen</h3>
+                        {{ end }}
+                   {{ end }}
+                   
+                   <!-- Content rendern -->
+                   {{ if $truncate }}
+                       {{ $page.Render "summary" }}
+                   {{ else }}
+                       {{ $page.Render "content" }}
+                   {{ end }}
+                   
+                   
+                   <!-- Wrapper schließen wenn Type wechselt oder letzter Entry -->
+                   {{ if or (eq $nextIndex (len $paginator.Pages)) (ne $currentType $nextType) }}
+                       </div>
+                   {{ end }}
+               {{ end }}
+               
+               {{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
+                   {{ partial "pagination.html" . }}
+               {{ end }}
+               </div>
+           </div>
+       </div>
+     </section>
 
 {{ end }}
 

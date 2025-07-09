@@ -130,7 +130,7 @@
 		{{ $.Scratch.Set "content" $noteContent }}
 	{{ end }}
 
-	{{ $podcastTechIsGood := print "/podcast/tech-is-good/" $fileName ".md" }}
+	{{ $podcastTechIsGood := print "/podcast/Tech is Good/" $fileName ".md" }}
 	{{ if not (os.FileExists $podcastTechIsGood) }}
 		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
 		{{ $podcastTechIsGood = print "/podcast/tech-is-good/" $fileNameSanitized ".md" }}
