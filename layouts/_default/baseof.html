@@ -47,7 +47,7 @@
               </div>
               <div class="bg-dark {{ if .IsHome }} col-12 col-lg-7 offset-xxxl-1 col-xxxl-5 position-absolute top-0 p-xxl-3 pe-xxl-0 {{else }} position-absolute col-12 offset-xxl-2 col-xxl-8 {{end}}">
                 <div class="navbar navbar-expand-lg navbar-dark">
-                  <a class="navbar-brand d-lg-none pe-5" href="{{ .Site.BaseURL | relLangURL }}">Marcel <br/>Mellor</a>
+                  <a class="navbar-brand d-lg-none pe-5" href="{{ .Site.BaseURL | relLangURL }}">{{ .Site.Params.brand_name | safeHTML }}</a>
                   {{ if not .IsHome }}
                     <div class="flex-grow-1 d-lg-none">
                       <button class="btn btn-primary subscribe-newsletter">Abonnieren</button>
@@ -58,7 +58,7 @@
                   </button>
                   <div class="collapse navbar-collapse bg-dark" id="navbarNav">
                     <ul class="navbar-nav d-flex align-items-center {{ if .IsHome }} w-100 {{ end }}">
-                      <a class="navbar-brand d-none d-lg-block" href="{{ .Site.BaseURL | relLangURL }}">Marcel <br/>Mellor</a>
+                      <a class="navbar-brand d-none d-lg-block" href="{{ .Site.BaseURL | relLangURL }}">{{ .Site.Params.brand_name | safeHTML }}</a>
                       {{- $currentPage := . -}}
                       {{ range .Site.Menus.navbar }}
                       {{ $menuURL := .URL | relLangURL }}
