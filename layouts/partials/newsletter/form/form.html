@@ -1,0 +1,22 @@
+<div class="{{if eq .style "box"}} bg-dark text-white p-3{{end}}">
+<form class="newsletter" action="https://submit-form.com/ihIj820f" method="post" data-botpoison-public-key="pk_f887c781-6e0f-4a48-9ecb-2d2a5d519526">
+  <div class="">
+    <div class="d-md-flex flex-row d-grid gap-3">
+      <div class="flex-grow-1">
+        <input type="hidden" name="_redirect" value="{{.redirect  | default "https://www.marcelmellor.com/transactions/newsletter/optin/generic/" }}"
+  />
+        <input type="hidden" name="utm_source"/>
+        <input type="hidden" name="utm_medium" value="{{.utm_medium}}"/>
+        <input type="hidden" name="funnel" value="{{.funnel}}"/>
+        <input type="email" class="form-control {{if eq .size "big"}} form-control-lg {{end}} {{if eq .style "box"}} border-0 {{else}} border-dark border-2 {{end}}" name="email" aria-describedby="emailHelp" placeholder="E-Mail-Adresse" required>
+      </div>
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn  {{if eq .style "box"}} btn-primary {{else}} btn-primary  {{end}} {{if eq .size "big"}} btn-lg {{end}}">{{.cta  | default "Abonnieren" }}</button>
+      </div>
+    </div> 
+    <div class="mt-3">
+      <small>Niemals Werbung. Immer kostenlos. <a class="align-bottom text-white" href="/datenschutz">(Widerruf und Datenschutz)</a></small>
+    </div>
+  </div>
+</form>
+</div>
