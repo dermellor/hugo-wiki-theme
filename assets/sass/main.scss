@@ -68,7 +68,6 @@ h1, h2, h3, h4, h5, h6, p, div, a, li, sup {
 %section-title-highlight-display-1 {
     @extend %section-title-highlight;
     line-height: 1.05em;
-    z-index:1;
     &:after {
         border-bottom-width: 0.225em;
     }
@@ -84,6 +83,7 @@ h1, h2, h3, h4, h5, h6, p, div, a, li, sup {
     &:has(strong) {
         strong {
             @extend %section-title-highlight;
+            z-index:1;
         }
     }
     &:not(:has(strong)) {
