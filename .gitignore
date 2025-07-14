@@ -3,3 +3,4 @@ package-lock.json
 assets/mellor-style/
 
 **/.claude/settings.local.json
+.DS_Store
