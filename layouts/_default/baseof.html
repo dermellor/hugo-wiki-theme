@@ -38,15 +38,15 @@
 
     {{ block "masthead" . }}
 
-    <div class="{{ if .IsHome }} {{else}} sticky-top {{ end }} bg-dark">
+    <div class="{{ if .IsHome }} {{else}} sticky-top {{ end }} bg-{{ .Site.Params.navbar_bg | default "dark" }}">
       <div class="">
         <nav class="container-fluid px-lg-5">
             <div class="row position-relative {{ if .IsHome }} py-5 py-lg-0 {{ end }}">
-              <div style="height:5.1rem;" class="col-lg-2 d-none d-lg-block {{ if .IsHome }} px-0 position-absolute top-0 {{ else }} bg-dark {{end }}">
+              <div style="height:5.1rem;" class="col-lg-2 d-none d-lg-block {{ if .IsHome }} px-0 position-absolute top-0 {{ else }} bg-{{ .Site.Params.navbar_bg | default "dark" }} {{end }}">
             
               </div>
-              <div class="bg-dark {{ if .IsHome }} col-12 col-lg-7 offset-xxxl-1 col-xxxl-5 position-absolute top-0 p-xxl-3 pe-xxl-0 {{else }} position-absolute col-12 offset-xxl-2 col-xxl-8 {{end}}">
-                <div class="navbar navbar-expand-lg navbar-dark">
+              <div class="bg-{{ .Site.Params.navbar_bg | default "dark" }} {{ if .IsHome }} col-12 col-lg-7 offset-xxxl-1 col-xxxl-5 position-absolute top-0 p-xxl-3 pe-xxl-0 {{else }} position-absolute col-12 offset-xxl-2 col-xxl-8 {{end}}">
+                <div class="navbar navbar-expand-lg {{ $navbar_bg := .Site.Params.navbar_bg | default "dark" }}{{ if or (eq $navbar_bg "light") (eq $navbar_bg "white") }}navbar-light{{ else }}navbar-dark{{ end }}">
                   <a class="navbar-brand d-lg-none pe-5" href="{{ .Site.BaseURL | relLangURL }}">{{ .Site.Params.brand_name | safeHTML }}</a>
                   {{ if not .IsHome }}
                     <div class="flex-grow-1 d-lg-none">
@@ -56,7 +56,7 @@
                   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                   </button>
-                  <div class="collapse navbar-collapse bg-dark" id="navbarNav">
+                  <div class="collapse navbar-collapse bg-{{ .Site.Params.navbar_bg | default "dark" }}" id="navbarNav">
                     <ul class="navbar-nav d-flex align-items-center {{ if .IsHome }} w-100 {{ end }}">
                       <a class="navbar-brand d-none d-lg-block" href="{{ .Site.BaseURL | relLangURL }}">{{ .Site.Params.brand_name | safeHTML }}</a>
                       {{- $currentPage := . -}}
@@ -69,7 +69,7 @@
                             <a class="nav-link dropdown-toggle text-center {{ if or ($currentPage.IsMenuCurrent "navbar" .) ($currentPage.HasMenuCurrent "navbar" .) }} active{{end}}" href="{{ .URL }}" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" >
                               <span>{{ .Name }}</span>
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                            <ul class="dropdown-menu {{ $navbar_bg := .Site.Params.navbar_bg | default "dark" }}{{ if or (eq $navbar_bg "light") (eq $navbar_bg "white") }}dropdown-menu-light{{ else }}dropdown-menu-dark{{ end }}" aria-labelledby="navbarDropdown">
                               {{ range .Children }}
                                 <li class="text-center fs-5">
                                   <a class="dropdown-item" href="{{ .URL }}">{{ .Name }} </a>
