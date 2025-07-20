@@ -412,6 +412,10 @@ nav {
         line-height: $lead-font-size + 0.05rem;
         padding-right:2rem;
         font-weight: 500;
+        min-height:3.5rem;
+        @include media-breakpoint-up(lg) {
+            min-height: 5rem;
+        }
     }
     
     .navbar-nav  {

@@ -6,12 +6,14 @@
           <div style="height:5.1rem;" class="col-lg-2 d-none d-lg-block bg-{{ $navbar_bg }}">
         
           </div>
-          <div class="bg-{{ $navbar_bg }} position-absolute col-12 offset-xxl-2 col-xxl-8">
+          <div class="bg-{{ $navbar_bg }} position-absolute col-12">
             <div class="navbar navbar-expand-lg {{ if or (eq $navbar_bg "light") (eq $navbar_bg "white") }}navbar-light{{ else }}navbar-dark{{ end }}">
-              <a class="navbar-brand d-lg-none pe-5" href="{{ .Site.BaseURL | relLangURL }}">{{ .Site.Params.brand_name | safeHTML }}</a>
+              <a class="navbar-brand d-flex align-items-center d-lg-none pe-5" href="{{ .Site.BaseURL | relLangURL }}">{{ .Site.Params.brand_name | safeHTML }}</a>
 
               <div class="flex-grow-1 d-lg-none">
+                  {{ if eq .Site.Params.newsletter_header_link "true" }}
                   <button class="btn btn-primary subscribe-newsletter">Abonnieren</button>
+                  {{ end }}
                 </div>
 
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,7 +21,7 @@
               </button>
               <div class="collapse navbar-collapse bg-{{ $navbar_bg }}" id="navbarNav">
                 <ul class="navbar-nav d-flex align-items-center">
-                  <a class="navbar-brand d-none d-lg-block" href="{{ .Site.BaseURL | relLangURL }}">{{ .Site.Params.brand_name | safeHTML }}</a>
+                  <a class="navbar-brand d-none d-lg-flex align-items-center" href="{{ .Site.BaseURL | relLangURL }}">{{ .Site.Params.brand_name | safeHTML }}</a>
                   {{- $currentPage := . -}}
                   {{ range .Site.Menus.navbar }}
                   {{ $menuURL := .URL | relLangURL }}
@@ -52,7 +54,9 @@
                   -->
                 </ul>
               </div>
+              {{ if eq .Site.Params.newsletter_header_link "true" }}
               <button class="btn btn-primary d-none d-lg-block subscribe-newsletter">Abonnieren</button>
+              {{ end }}
             </div>
         </div>
       </div>

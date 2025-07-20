@@ -28,7 +28,6 @@ $light: #F9F9F9;
 $body-color: $purple;
 $mark-bg: $orange-200;
 
-$navbar-height: 4rem;
 $navbar-dark-hover-color: $white;
 $navbar-dark-color: $white;
 $navbar-brand-height: 1rem;
@@ -36,6 +35,8 @@ $navbar-padding-y: 0;
 $navbar-nav-link-padding-x: 0;
 $navbar-brand-padding-y: 0.75rem;
 $navbar-brand-margin-end: 0rem;
+$navbar-light-brand-color: $dark;
+$navbar-light-toggler-border-color: rgba($dark, 0.5);
 
 $dropdown-dark-bg: $purple;
 $dropdown-border-width: 0;
