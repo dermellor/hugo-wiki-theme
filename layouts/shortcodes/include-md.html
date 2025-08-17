@@ -1,0 +1,8 @@
+{{ $file := .Get 0 }}
+{{ $raw := $file | readFile }}
+{{/* Strip YAML front matter (--- ... ---) if present */}}
+{{ $noYaml := replaceRE `(?s)^---\r?\n.*?\r?\n---\r?\n*` `` $raw }}
+{{/* Strip TOML front matter (+++ ... +++) if present */}}
+{{ $noToml := replaceRE `(?s)^\+\+\+\r?\n.*?\r?\n\+\+\+\r?\n*` `` $noYaml }}
+{{ $content := $noToml }}
+{{ $content | markdownify }}
