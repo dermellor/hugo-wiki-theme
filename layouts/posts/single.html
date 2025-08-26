@@ -90,7 +90,7 @@
               <div class="lead d-flex w-100 mb-3 fw-bold ">
                 <div class=""><time {{ .Date.Format "2006-01-02T15:04:05Z07:00" | printf "datetime=%q" | safeHTMLAttr }}>{{ .Date.Format $dateFormat }}</time></div>
                 <div class="ms-auto">
-                    Artikel teilen
+                    {{ i18n "shareArticle" }}
                     <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ .Permalink }}"><i class="bi-linkedin ps-2"></i></a>
                     <a href="mailto:?subject={{ .Title | safeURL }}&body={{ .Permalink  | safeURL }}"><i class="bi-send ps-2"></i></a>
                 </div>
@@ -299,13 +299,13 @@
             }"
           >
             <hr/>
-            <h3>Kommentare</h3>
+            <h3>{{ i18n "comments" }}</h3>
 
             <!-- Kommentare anzeigen -->
             <div class="mt-4">
               <div x-show="isLoading" class="text-center">
                 <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Lädt...</span>
+                  <span class="visually-hidden">{{ i18n "loading" }}</span>
                 </div>
               </div>
 
@@ -313,7 +313,7 @@
               <div x-show="successMessage" class="alert alert-success" x-text="successMessage"></div>
 
               <template x-if="comments.length === 0 && !isLoading">
-                <p class="text-muted">Keine Kommentare vorhanden. Sei der Erste, der einen Kommentar hinterlässt!</p>
+                <p class="text-muted">{{ i18n "noCommentsYet" }}</p>
               </template>
 
               <template x-for="comment in comments" :key="comment.id">
@@ -322,13 +322,13 @@
                   <small class="text-muted ms-2" x-text="formatTimestamp(comment.created_at)"></small>
 
                   <template x-if="!comment.published && $store.auth.user && comment.author_id === $store.auth.user.id">
-                    <span class="badge bg-warning text-dark ms-2">Genehmigung ausstehend</span>
+                    <span class="badge bg-warning text-dark ms-2">{{ i18n "approvalPending" }}</span>
                   </template>
 
                   <p class="mt-1" x-text="comment.content"></p>
 
                   <template x-if="!comment.published && $store.auth.user && comment.author_id === $store.auth.user.id">
-                    <small class="text-muted d-block mt-1">Dein Kommentar wird nach der Überprüfung für alle sichtbar sein.</small>
+                    <small class="text-muted d-block mt-1">{{ i18n "commentVisibleAfterReview" }}</small>
                   </template>
                 </div>
               </template>
@@ -337,23 +337,23 @@
             <!-- Login-Prompt oder Kommentarformular -->
             <template x-if="!$store.auth.session">
               <div class="alert alert-info mt-4">
-                Du musst <a href="#" @click.prevent="openLoginModal()">eingeloggt sein</a>, um kommentieren zu können.
+                {{ i18n "mustBeLoggedInWithLink" (dict "LinkStart" "<a href=\"#\" @click.prevent=\"openLoginModal()\">" "LinkEnd" "</a>") | safeHTML }}
               </div>
             </template>
 
             <template x-if="$store.auth.session">
               <div>
                 <div class="mt-4 mb-2">
-                  <small>Du kommentierst als <strong x-text="$store.auth.displayName || 'Anonymer Nutzer'"></strong></small>
+                  <small>{{ i18n "commentingAs" }} <strong x-text="$store.auth.displayName || '{{ i18n "anonymousUser" }}'"></strong></small>
                 </div>
 
                 <form class="mt-2" @submit.prevent="submitComment()">
                   <div class="mb-3">
-                    <textarea class="form-control" x-model="commentText" placeholder="Dein Kommentar" rows="3"></textarea>
+                    <textarea class="form-control" x-model="commentText" placeholder="{{ i18n "yourComment" }}" rows="3"></textarea>
                   </div>
                   <button type="submit" class="btn btn-primary" :disabled="isLoading || !commentText.trim()">
                     <span x-show="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Kommentar abschicken
+                    {{ i18n "submitComment" }}
                   </button>
                 </form>
               </div>
@@ -411,14 +411,16 @@
       mit dem neuen System zu vermeiden.
       -->
 
-        {{ if $.Param "newsletter_cta" }}
+        {{ if eq .Site.Language.Lang "de" }}
+          {{ if $.Param "newsletter_cta" }}
 
-          {{ if (ne ($.Param "newsletter_subscription_address") false) }}
-            {{ partial "newsletter.html" . }}
+            {{ if (ne ($.Param "newsletter_subscription_address") false) }}
+              {{ partial "newsletter.html" . }}
+            {{ end }}
+
+          {{ else }}
+            {{ partial "newsletter/form/big.html" (dict "utm_medium" "post") }}
           {{ end }}
-
-        {{ else }}
-          {{ partial "newsletter/form/big.html" (dict "utm_medium" "post") }}
         {{ end }}
 
 
