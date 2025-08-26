@@ -32,6 +32,10 @@
     {{ end }}
 
     {{ partial "head-custom.html" . }}
+
+    {{ if .Site.Params.lang_auto_switch }}
+      {{ partial "lang-auto-switch.html" . }}
+    {{ end }}
   </head>
 
   <body class="d-flex flex-column min-vh-100 overflow-x-hidden {{.Type }} {{ if .IsHome }} home {{ end }} highlightr-realistic">
@@ -70,7 +74,7 @@
                 </li>
                 {{ range .Site.Params.footer_links }}
                   <li class="nav-item">
-                    <a class="nav-link px-2 text-white" href="{{ .url }}">{{ .title }}</a>
+                    <a class="nav-link px-2 text-white" href="{{ .url | relLangURL }}">{{ .title }}</a>
                   </li>
                 {{ end }}
                 <li class="nav-item">

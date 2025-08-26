@@ -1,0 +1,25 @@
+<script>
+(function () {
+  try {
+    var deRoot = '{{ range .Site.Home.AllTranslations }}{{ if eq .Lang "de" }}{{ .RelPermalink }}{{ end }}{{ end }}' || '/de/';
+    var path = location.pathname;
+    // do nothing if already on DE
+    if (path.indexOf(deRoot) === 0) return;
+    // only consider homepage to avoid breaking deep links
+    if (path !== '/' && path !== '{{ .Site.Home.RelPermalink }}') return;
+    // respect explicit user choice if stored
+    var pref = localStorage.getItem('lang_pref');
+    if (pref === 'en' || pref === 'de') return;
+    // avoid repeated redirects per session
+    if (sessionStorage.getItem('lang_redirect_done') === '1') return;
+    // Prefer navigator.languages over navigator.language
+    var langs = (navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || navigator.userLanguage || '']).map(function (s) { return (s || '').toLowerCase(); });
+    var isGerman = langs.some(function (l) { return l === 'de' || l.indexOf('de-') === 0; });
+    if (isGerman) {
+      sessionStorage.setItem('lang_redirect_done', '1');
+      location.replace(deRoot);
+    }
+  } catch (e) { /* noop */ }
+})();
+</script>
+
