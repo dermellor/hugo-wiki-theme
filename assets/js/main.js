@@ -100,6 +100,11 @@ document.addEventListener("DOMContentLoaded", function(){
       formElement.addEventListener("botpoison-challenge-error", function () {
         buttonElement.removeAttribute("disabled");
       });
+      
+      // Newsletter form submission tracking
+      formElement.addEventListener("submit", function() {
+        plausible('newsletterSubmit');
+      });
     });
 
 //Set source

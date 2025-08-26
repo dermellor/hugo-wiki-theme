@@ -79,6 +79,12 @@
 {{ $grabacoffee := resources.Get "js/grabacoffee.js" }}
 
 {{ $bundle := slice $main $members $alpine $inlineFootnotes $marginBox $grabacoffee | resources.Concat "js/bundle.js" | minify }}
+<script>
+  // Localized strings for JavaScript
+  window.i18nStrings = {
+    buyMeACoffeeText: "{{ i18n "buyMeACoffeeText" }}"
+  };
+</script>
 <script src="{{ $bundle.Permalink }}"></script>
 
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>

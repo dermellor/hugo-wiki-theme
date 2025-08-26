@@ -29,8 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const coffeeLink = document.createElement('a');
       coffeeLink.href = buyMeACoffeeURL;
-      // Textinhalt des Links
-      coffeeLink.innerHTML = 'Der Artikel hilft dir weiter? Spendiere mir einen Kaffee! ☕🙏';
+      // Textinhalt des Links (lokalisiert)
+      coffeeLink.innerHTML = window.i18nStrings?.buyMeACoffeeText || 'Der Artikel hilft dir weiter? Spendiere mir einen Kaffee! ☕🙏';
       coffeeLink.target = '_blank'; // Link in neuem Tab öffnen
       coffeeLink.rel = 'noopener noreferrer'; // Sicherheitsaspekt für target="_blank"
       // coffeeLink.classList.add('alert-link'); // Optional, wenn der gesamte Text ein Link sein soll und speziell hervorgehoben werden soll
