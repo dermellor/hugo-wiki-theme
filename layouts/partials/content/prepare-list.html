@@ -1,0 +1,54 @@
+{{/*
+  Partial: content/prepare-list.html
+  Purpose: Read a localized Markdown file, render to HTML, extract first paragraph and list items (<li> inner HTML), and store them in .Scratch.
+  Keys:
+    - firstp:<lang>:<path>  => first <p> ... </p> block as HTML string
+    - listitems:<lang>:<path> => slice of inner HTML for each <li>
+*/}}
+{{ $ctx := .ctx }}
+{{ $lang := $ctx.Site.Language.Lang }}
+{{ $path := .path }}
+
+{{/* Support hidden dotfiles by trying a dot-variant of the path */}}
+{{ $dotPath := replaceRE `(?s)^(.*?)/([^/]+)$` `$1/.$2` $path }}
+{{ $primary := printf "content/%s/%s" $lang $path }}
+{{ $primaryDot := printf "content/%s/%s" $lang $dotPath }}
+{{ $themeLang := printf "themes/hugo-wiki-theme/content/%s/%s" $lang $path }}
+{{ $themeLangDot := printf "themes/hugo-wiki-theme/content/%s/%s" $lang $dotPath }}
+{{ $themeDefault := printf "themes/hugo-wiki-theme/content/%s" $path }}
+{{ $themeDefaultDot := printf "themes/hugo-wiki-theme/content/%s" $dotPath }}
+{{ $raw := "" }}
+{{ if fileExists $primary }}
+  {{ $raw = readFile $primary }}
+{{ else if fileExists $primaryDot }}
+  {{ $raw = readFile $primaryDot }}
+{{ else if fileExists $themeLang }}
+  {{ $raw = readFile $themeLang }}
+{{ else if fileExists $themeLangDot }}
+  {{ $raw = readFile $themeLangDot }}
+{{ else if fileExists $themeDefault }}
+  {{ $raw = readFile $themeDefault }}
+{{ else if fileExists $themeDefaultDot }}
+  {{ $raw = readFile $themeDefaultDot }}
+{{ end }}
+
+{{ if $raw }}
+  {{/* Strip front matter */}}
+  {{ $noYaml := replaceRE `(?s)^---\r?\n.*?\r?\n---\r?\n*` `` $raw }}
+  {{ $noToml := replaceRE `(?s)^\+\+\+\r?\n.*?\r?\n\+\+\+\r?\n*` `` $noYaml }}
+  {{ $html := $noToml | markdownify }}
+
+  {{/* First paragraph */}}
+  {{ $p := index (findRE `(?s)<p>.*?</p>` $html) 0 | default "" }}
+  {{ $ctx.Scratch.Set (printf "firstp:%s:%s" $lang $path) $p }}
+
+  {{/* List items */}}
+  {{ $lis := findRE `(?s)<li[^>]*>.*?</li>` $html }}
+  {{ $items := slice }}
+  {{ range $lis }}
+    {{ $inner := replaceRE `(?s)^<li[^>]*>(.*)</li>$` `$1` . }}
+    {{ $items = $items | append $inner }}
+  {{ end }}
+  {{ $ctx.Scratch.Set (printf "listitems:%s:%s" $lang $path) $items }}
+{{ end }}
+

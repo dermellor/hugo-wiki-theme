@@ -1,0 +1,122 @@
+{{/*
+  Partial: content/section-md.html
+  Purpose: From a single Markdown file (e.g., home/benefits.md), extract sections defined by H2 headings (## Heading) and their following paragraphs, localized per language.
+  Usage examples:
+    - Body HTML of a section: {{ partial "content/section-md.html" (dict "ctx" . "path" "home/benefits.md" "heading" "Monatlich kündbar" ) }}
+    - Title only:           {{ partial "content/section-md.html" (dict "ctx" . "path" "home/benefits.md" "heading" "Monatlich kündbar" "part" "title") }}
+    - Strip outer <p>:      {{ partial "content/section-md.html" (dict "ctx" . "path" "home/benefits.md" "heading" "Intro" "stripouterp" true) }}
+*/}}
+{{ $ctx := .ctx }}
+{{ $lang := $ctx.Site.Language.Lang }}
+{{ $path := .path }}
+{{ $want := .part | default "body" }}
+{{ $strip := .stripouterp | default false }}
+
+{{ $cacheKey := printf "sections:%s:%s" $lang $path }}
+{{ $sections := $ctx.Scratch.Get $cacheKey }}
+
+{{ if not $sections }}
+  {{/* Resolve file by precedence: site lang -> theme lang -> theme default (no lang) */}}
+  {{ $dotPath := replaceRE `(?s)^(.*?)/([^/]+)$` `$1/.$2` $path }}
+  {{ $primary := printf "content/%s/%s" $lang $path }}
+  {{ $primaryDot := printf "content/%s/%s" $lang $dotPath }}
+  {{ $themeLang := printf "themes/hugo-wiki-theme/content/%s/%s" $lang $path }}
+  {{ $themeLangDot := printf "themes/hugo-wiki-theme/content/%s/%s" $lang $dotPath }}
+  {{ $themeDefault := printf "themes/hugo-wiki-theme/content/%s" $path }}
+  {{ $themeDefaultDot := printf "themes/hugo-wiki-theme/content/%s" $dotPath }}
+  {{ $raw := "" }}
+  {{ if fileExists $primary }}
+    {{ $raw = readFile $primary }}
+  {{ else if fileExists $primaryDot }}
+    {{ $raw = readFile $primaryDot }}
+  {{ else if fileExists $themeLang }}
+    {{ $raw = readFile $themeLang }}
+  {{ else if fileExists $themeLangDot }}
+    {{ $raw = readFile $themeLangDot }}
+  {{ else if fileExists $themeDefault }}
+    {{ $raw = readFile $themeDefault }}
+  {{ else if fileExists $themeDefaultDot }}
+    {{ $raw = readFile $themeDefaultDot }}
+  {{ end }}
+
+  {{ if $raw }}
+    {{/* Strip front matter */}}
+    {{ $noYaml := replaceRE `(?s)^---\r?\n.*?\r?\n---\r?\n*` `` $raw }}
+    {{ $noToml := replaceRE `(?s)^\+\+\+\r?\n.*?\r?\n\+\+\+\r?\n*` `` $noYaml }}
+    {{ $md := $noToml | strings.TrimSpace }}
+
+    {{/* Insert marker before each H2 heading so we can split reliably */}}
+    {{ $tagged := replaceRE `(?m)^##\s+` "\n@@H@@## " $md }}
+    {{ $parts := split $tagged "@@H@@" }}
+
+    {{/* Build both a map (key -> entry) and an ordered list of entries */}}
+    {{ $mapName := printf "map:%s" $cacheKey }}
+    {{ $listKey := printf "list:%s" $cacheKey }}
+    {{ $list := slice }}
+    {{ range $parts }}
+      {{ $part := . | strings.TrimSpace }}
+      {{ if $part }}
+        {{ $headingLine := index (findRE `(?m)^##\s+.+$` $part) 0 | default "" }}
+        {{ if $headingLine }}
+          {{ $title := replaceRE `(?m)^##\s+` "" $headingLine }}
+          {{ $cleanTitle := replaceRE `(?m)^\[([^\]]+)\]\s*` "" $title }}
+          {{ $keyCandidate := replaceRE `(?s)^\s*\[([^\]]+)\].*` `$1` $title }}
+          {{ $key := cond (ne $keyCandidate $title) $keyCandidate $cleanTitle }}
+          {{ $bodyMd := replaceRE `(?s)^##\s+.+?\r?\n` "" $part }}
+          {{ $bodyHtml := $bodyMd | markdownify }}
+          {{ $imgTag := index (findRE `(?s)<img[^>]*>` $bodyHtml) 0 | default "" }}
+          {{ $imgsrc := "" }}
+          {{ $imgalt := "" }}
+          {{ if $imgTag }}
+            {{ $imgsrc = replaceRE `(?s).*?src=\"([^\"]+)\".*` `$1` $imgTag }}
+            {{ $imgalt = replaceRE `(?s).*?alt=\"([^\"]*)\".*` `$1` $imgTag }}
+            {{ $bodyHtml = replaceRE `(?s)<img[^>]*>\s*` "" $bodyHtml }}
+          {{ end }}
+          {{ $entry := dict "title" $cleanTitle "html" $bodyHtml "imgsrc" $imgsrc "imgalt" $imgalt }}
+          {{ $.ctx.Scratch.SetInMap $mapName $key $entry }}
+          {{ $list = $list | append $entry }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+    {{/* Store in cache for reuse */}}
+    {{ $sections = $.ctx.Scratch.Get $mapName }}
+    {{ $ctx.Scratch.Set $cacheKey $sections }}
+    {{ $ctx.Scratch.Set $listKey $list }}
+  {{ end }}
+{{ end }}
+
+{{/* Selection: by index (1-based) or by key/heading */}}
+{{ with .index }}
+  {{ $i1 := . }}
+  {{ $i0 := sub $i1 1 }}
+  {{ $list := $ctx.Scratch.Get (printf "list:%s:%s:%s" "sections" $lang $path) | default ($ctx.Scratch.Get (printf "list:%s:%s" $lang $path)) }}
+  {{ if and $list (ge $i0 0) (lt $i0 (len $list)) }}
+    {{ $e := index $list $i0 }}
+    {{ if eq $want "title" }}
+      {{ $e.title | safeHTML }}
+    {{ else }}
+      {{ $out := $e.html }}
+      {{ if $strip }}
+        {{ $out = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $out }}
+      {{ end }}
+      {{ $out | safeHTML }}
+    {{ end }}
+  {{ end }}
+{{ else }}
+  {{ $heading := .heading | default .key }}
+  {{ with $sections }}
+    {{ $entry := index . $heading }}
+    {{ if $entry }}
+      {{ if eq $want "title" }}
+        {{ $entry.title | safeHTML }}
+      {{ else }}
+        {{ $out := $entry.html }}
+        {{ if $strip }}
+          {{ $out = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $out }}
+        {{ end }}
+        {{ $out | safeHTML }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+

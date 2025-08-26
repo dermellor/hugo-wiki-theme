@@ -1,0 +1,12 @@
+{{/*
+  Partial: content/prepare-sections.html
+  Ensures sections for a given localized Markdown file are parsed and stored in .Scratch.
+  After calling this partial, access list via:
+    {{ $list := .Scratch.Get (printf "list:sections:%s:%s" .Site.Language.Lang "home/benefits.md") }}
+*/}}
+{{ $ctx := .ctx }}
+{{ $lang := $ctx.Site.Language.Lang }}
+{{ $path := .path }}
+{{/* Use section-md to trigger parsing; select index 1 (arbitrary) but nothing is rendered here */}}
+{{ $noop := partial "content/section-md.html" (dict "ctx" $ctx "path" $path "index" 1 "part" "title") }}
+

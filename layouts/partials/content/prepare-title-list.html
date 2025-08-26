@@ -1,0 +1,69 @@
+{{/*
+  Partial: content/prepare-title-list.html
+  Purpose: Read a localized Markdown file (supports hidden dotfiles), extract title from front matter,
+           first paragraph and list items from rendered HTML, and store in Scratch.
+  Scratch keys used:
+    title:<lang>:<base>     -> page title from front matter
+    firstp:<lang>:<base>    -> first <p>...</p> block
+    listitems:<lang>:<base> -> slice of inner HTML for each <li>
+*/}}
+{{ $ctx := .ctx }}
+{{ $lang := $ctx.Site.Language.Lang }}
+{{ $base := .path }}
+
+{{/* Build candidate paths: prefer hidden dotfile, with language and theme fallbacks */}}
+{{ $dotbase := replaceRE `(?s)^(.*?)/([^/]+)$` `$1/.$2` $base }}
+{{ $cands := slice
+  (printf "content/%s/%s.md" $lang $dotbase)
+  (printf "content/%s/%s.md" $lang $base)
+  (printf "themes/hugo-wiki-theme/content/%s/%s.md" $lang $dotbase)
+  (printf "themes/hugo-wiki-theme/content/%s/%s.md" $lang $base)
+  (printf "themes/hugo-wiki-theme/content/%s.md" $dotbase)
+  (printf "themes/hugo-wiki-theme/content/%s.md" $base)
+}}
+
+{{ $raw := "" }}
+{{ range $cands }}
+  {{ if and (eq $raw "") (fileExists .) }}
+    {{ $raw = readFile . }}
+  {{ end }}
+{{ end }}
+
+{{ if $raw }}
+  {{/* Extract title from front matter (YAML or TOML) */}}
+  {{ $title := "" }}
+  {{ $yaml := index (findRE `(?s)^---\s*\n(.*?)\n---\s*` $raw) 0 }}
+  {{ if $yaml }}
+    {{/* Extract just the title line from YAML and strip the key and quotes */}}
+    {{ $titleLine := index (findRE `(?m)^title:\s*(\"[^\"]*\"|[^\n]+)\s*$` $yaml) 0 | default "" }}
+    {{ if $titleLine }}
+      {{ $title = replaceRE `(?m)^title:\s*\"?(.+?)\"?\s*$` `$1` $titleLine }}
+    {{ end }}
+  {{ else }}
+    {{ $toml := index (findRE `(?s)^\+\+\+\s*\n(.*?)\n\+\+\+\s*` $raw) 0 }}
+    {{ if $toml }}
+      {{ $titleLine := index (findRE `(?m)^title\s*=\s*(\"[^\"]*\"|[^\n]+)\s*$` $toml) 0 | default "" }}
+      {{ if $titleLine }}
+        {{ $title = replaceRE `(?m)^title\s*=\s*\"?(.+?)\"?\s*$` `$1` $titleLine }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+  {{ $ctx.Scratch.Set (printf "title:%s:%s" $lang $base) $title }}
+
+  {{/* Remove front matter and render */}}
+  {{ $noYaml := replaceRE `(?s)^---\r?\n.*?\r?\n---\r?\n*` `` $raw }}
+  {{ $noToml := replaceRE `(?s)^\+\+\+\r?\n.*?\r?\n\+\+\+\r?\n*` `` $noYaml }}
+  {{ $html := $noToml | markdownify }}
+
+  {{ $pfirst := index (findRE `(?s)<p>.*?</p>` $html) 0 | default "" }}
+  {{ $ctx.Scratch.Set (printf "firstp:%s:%s" $lang $base) $pfirst }}
+
+  {{ $lis := findRE `(?s)<li[^>]*>.*?</li>` $html }}
+  {{ $items := slice }}
+  {{ range $lis }}
+    {{ $inner := replaceRE `(?s)^<li[^>]*>(.*)</li>$` `$1` . }}
+    {{ $items = $items | append $inner }}
+  {{ end }}
+  {{ $ctx.Scratch.Set (printf "listitems:%s:%s" $lang $base) $items }}
+{{ end }}
+

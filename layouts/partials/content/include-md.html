@@ -1,0 +1,35 @@
+{{/*
+  Partial: content/include-md.html
+  Usage: {{ partial "content/include-md.html" (dict "ctx" . "path" "home/hero-title.md" "stripouterp" true) }}
+  - Looks for content at content/<lang>/<path>, then falls back to themes/hugo-wiki-theme/content/<lang>/<path>, then theme default without lang.
+  - Renders Markdown; if stripouterp is true, removes a single outer <p> wrapper to allow injecting into existing <p class> wrappers without changing HTML.
+*/}}
+{{ $ctx := .ctx }}
+{{ $lang := $ctx.Site.Language.Lang }}
+{{ $path := .path }}
+{{ $strip := .stripouterp | default false }}
+
+{{ $primary := printf "content/%s/%s" $lang $path }}
+{{ $themeLang := printf "themes/hugo-wiki-theme/content/%s/%s" $lang $path }}
+{{ $themeDefault := printf "themes/hugo-wiki-theme/content/%s" $path }}
+
+{{ $raw := "" }}
+{{ if fileExists $primary }}
+  {{ $raw = readFile $primary }}
+{{ else if fileExists $themeLang }}
+  {{ $raw = readFile $themeLang }}
+{{ else if fileExists $themeDefault }}
+  {{ $raw = readFile $themeDefault }}
+{{ end }}
+
+{{ if $raw }}
+  {{/* Strip front matter if present */}}
+  {{ $noYaml := replaceRE `(?s)^---\r?\n.*?\r?\n---\r?\n*` `` $raw }}
+  {{ $noToml := replaceRE `(?s)^\+\+\+\r?\n.*?\r?\n\+\+\+\r?\n*` `` $noYaml }}
+  {{ $rendered := $noToml | markdownify }}
+  {{ if $strip }}
+    {{ $rendered = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $rendered }}
+  {{ end }}
+  {{ $rendered | safeHTML }}
+{{ end }}
+
