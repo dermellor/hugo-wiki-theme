@@ -99,6 +99,12 @@
 			{{ end}}
 			{{ if and (ne .Params.distribution nil) ( in .Params.distribution "Blog") }}
 				{{ $link = .Permalink }}
+				{{ if hasPrefix $link $page.Site.BaseURL }}
+					{{ $link = strings.TrimPrefix $page.Site.BaseURL $link }}
+					{{ if not (hasPrefix $link "/") }}
+						{{ $link = printf "/%s" $link }}
+					{{ end }}
+				{{ end }}
 			{{ end}}
 			{{ if eq $title $fileName }}
 				{{ $title = .Title }}
@@ -120,6 +126,12 @@
 
 		{{ with $page.GetPage $post}}
 			{{ $link = .Permalink }}
+			{{ if hasPrefix $link $page.Site.BaseURL }}
+				{{ $link = strings.TrimPrefix $page.Site.BaseURL $link }}
+				{{ if not (hasPrefix $link "/") }}
+					{{ $link = printf "/%s" $link }}
+				{{ end }}
+			{{ end }}
 			{{ if eq $title $fileName }}
 				{{ $title = .Title }}
 			{{ end }}
@@ -140,6 +152,12 @@
 
 		{{ with $page.GetPage $podcastTechIsGood}}
 			{{ $link = .Permalink }}
+			{{ if hasPrefix $link $page.Site.BaseURL }}
+				{{ $link = strings.TrimPrefix $page.Site.BaseURL $link }}
+				{{ if not (hasPrefix $link "/") }}
+					{{ $link = printf "/%s" $link }}
+				{{ end }}
+			{{ end }}
 			{{ if eq $title $fileName }}
 				{{ $title = .Title }}
 			{{ end }}
@@ -160,6 +178,12 @@
 
 		{{ with $page.GetPage $podcastSkalierbar}}
 			{{ $link = .Permalink }}
+			{{ if hasPrefix $link $page.Site.BaseURL }}
+				{{ $link = strings.TrimPrefix $page.Site.BaseURL $link }}
+				{{ if not (hasPrefix $link "/") }}
+					{{ $link = printf "/%s" $link }}
+				{{ end }}
+			{{ end }}
 			{{ if eq $title $fileName }}
 				{{ $title = .Title }}
 			{{ end }}
@@ -178,6 +202,12 @@
 	{{ if os.FileExists $article }}
 		{{ $link = findRESubmatch "\\[Web-URL\\]\\((.+?)\\)"  (os.ReadFile $article) 1 }}
 		{{ $link = index (index $link 0) 1 }}
+		{{ if hasPrefix $link $page.Site.BaseURL }}
+			{{ $link = strings.TrimPrefix $page.Site.BaseURL $link }}
+			{{ if not (hasPrefix $link "/") }}
+				{{ $link = printf "/%s" $link }}
+			{{ end }}
+		{{ end }}
 		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
 		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
 		{{ $.Scratch.Set "content" $noteContent }}
@@ -191,6 +221,12 @@
 	{{ if os.FileExists $book }}
 		{{ $link = findRESubmatch "\\[Web-URL\\]\\((.+?)\\)"  (os.ReadFile $book) 1 }}
 		{{ $link = index (index $link 0) 1 }}
+		{{ if hasPrefix $link $page.Site.BaseURL }}
+			{{ $link = strings.TrimPrefix $page.Site.BaseURL $link }}
+			{{ if not (hasPrefix $link "/") }}
+				{{ $link = printf "/%s" $link }}
+			{{ end }}
+		{{ end }}
 		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}
 		{{ $noteContent := replace ($.Scratch.Get "content") $wikilink $link}}
 		{{ $.Scratch.Set "content" $noteContent }}
@@ -205,6 +241,12 @@
 
 		{{ with $page.GetPage $index}}
 			{{ $link = .Permalink }}
+			{{ if hasPrefix $link $page.Site.BaseURL }}
+				{{ $link = strings.TrimPrefix $page.Site.BaseURL $link }}
+				{{ if not (hasPrefix $link "/") }}
+					{{ $link = printf "/%s" $link }}
+				{{ end }}
+			{{ end }}
 		{{ end }}
 
 		{{ $link = print  "<a href =\"" $link "\">" $title "</a>"}}

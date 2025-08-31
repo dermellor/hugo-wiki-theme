@@ -20,6 +20,7 @@
                  {{ $pages = $categoryPages }}
                {{ end }}
                
+               {{ $pages := where $pages "Draft" false }}
                {{ $paginator := .Paginate $pages.ByDate.Reverse 30 }}
 
                {{ range $index, $page := $paginator.Pages }}

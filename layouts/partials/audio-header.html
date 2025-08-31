@@ -3,6 +3,7 @@
     {{ if reflect.IsSlice .file }}
         {{ $audioFile = index .file 0 }}
     {{ end }}
+    {{ $audioFile = $audioFile | strings.TrimSpace }}
     
     <div class="d-flex flex-row align-items-end">
         <audio controls preload="true" class="">

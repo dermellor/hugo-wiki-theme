@@ -63,7 +63,18 @@
           {{ $keyCandidate := replaceRE `(?s)^\s*\[([^\]]+)\].*` `$1` $title }}
           {{ $key := cond (ne $keyCandidate $title) $keyCandidate $cleanTitle }}
           {{ $bodyMd := replaceRE `(?s)^##\s+.+?\r?\n` "" $part }}
-          {{ $bodyHtml := $bodyMd | markdownify }}
+
+          {{/* Extract optional Markdown audio link and remove it from body before rendering */}}
+          {{ $audio := "" }}
+          {{ $audioRE := `(?s)\[[^\]]*\]\(([^)]+\.(mp3|wav|m4a|ogg|oga|webm|mp4|m4b))\)` }}
+          {{ $firstAudioMatch := index (findRE $audioRE $bodyMd) 0 | default "" }}
+          {{ if $firstAudioMatch }}
+            {{ $audio = (replaceRE $audioRE `$1` $firstAudioMatch) | strings.TrimSpace }}
+            {{ $bodyMd = replaceRE $audioRE "" $bodyMd }}
+          {{ end }}
+
+          {{/* Render Markdown with shortcode support using the page context */}}
+          {{ $bodyHtml := $ctx.RenderString $bodyMd }}
           {{ $imgTag := index (findRE `(?s)<img[^>]*>` $bodyHtml) 0 | default "" }}
           {{ $imgsrc := "" }}
           {{ $imgalt := "" }}
@@ -72,7 +83,11 @@
             {{ $imgalt = replaceRE `(?s).*?alt=\"([^\"]*)\".*` `$1` $imgTag }}
             {{ $bodyHtml = replaceRE `(?s)<img[^>]*>\s*` "" $bodyHtml }}
           {{ end }}
-          {{ $entry := dict "title" $cleanTitle "html" $bodyHtml "imgsrc" $imgsrc "imgalt" $imgalt }}
+          {{/* Render the heading as Markdown (e.g., **bold**) and strip outer <p> */}}
+          {{ $titleHtml := $ctx.RenderString $cleanTitle }}
+          {{ $titleHtml = replaceRE `(?s)^<p>(.*)</p>\s*$` `$1` $titleHtml }}
+
+          {{ $entry := dict "title" $titleHtml "html" $bodyHtml "imgsrc" ($imgsrc | strings.TrimSpace) "imgalt" ($imgalt | strings.TrimSpace) "audio" $audio }}
           {{ $.ctx.Scratch.SetInMap $mapName $key $entry }}
           {{ $list = $list | append $entry }}
         {{ end }}
@@ -94,6 +109,9 @@
     {{ $e := index $list $i0 }}
     {{ if eq $want "title" }}
       {{ $e.title | safeHTML }}
+    {{ else if eq $want "audio" }}{{- $e.audio | strings.TrimSpace -}}
+    {{ else if eq $want "imgsrc" }}{{- $e.imgsrc | strings.TrimSpace -}}
+    {{ else if eq $want "imgalt" }}{{- $e.imgalt | strings.TrimSpace -}}
     {{ else }}
       {{ $out := $e.html }}
       {{ if $strip }}
@@ -109,6 +127,9 @@
     {{ if $entry }}
       {{ if eq $want "title" }}
         {{ $entry.title | safeHTML }}
+      {{ else if eq $want "audio" }}{{- $entry.audio | strings.TrimSpace -}}
+      {{ else if eq $want "imgsrc" }}{{- $entry.imgsrc | strings.TrimSpace -}}
+      {{ else if eq $want "imgalt" }}{{- $entry.imgalt | strings.TrimSpace -}}
       {{ else }}
         {{ $out := $entry.html }}
         {{ if $strip }}
@@ -119,4 +140,3 @@
     {{ end }}
   {{ end }}
 {{ end }}
-

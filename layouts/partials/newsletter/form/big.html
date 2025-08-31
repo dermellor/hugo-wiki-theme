@@ -1,8 +1,8 @@
 <div class="row">
     <div class="col-12 col-lg-7 align-self-center">
-        <h2 class="section-title display-5 mb-4 mb-lg-5">Newsletter</h2>
-            <p class="lead lh-sm">Du bist ein Innovator. Ein Entscheider, ein Produktverantwortlicher, ein Unternehmer – oder einfach jemand, der gerne ungelöste Probleme angeht.</p>
-            <p class="lead lh-sm">In meinem Newsletter liefere ich dir das Material für deine Projekte: Perspektiven auf aktuelle Tech-Trends, Praxistipps und Aha-Momente. Jeden Donnerstag in deinem Postfach.
+        <h2 class="section-title display-5 mb-4 mb-lg-5">{{ i18n "newsletterTitle" }}</h2>
+            <p class="lead lh-sm">{{ i18n "newsletterLead1" }}</p>
+            <p class="lead lh-sm">{{ i18n "newsletterLead2" }}
               </p>
               <div class="pt-3">
                 {{ partial "newsletter/form/form.html" (dict "size" "big" "style" "box" "utm_medium" "direct" ) }}
