@@ -8,6 +8,8 @@ $navbar-height: 0;
 @import "custom_styles";
 
 $enable-negative-margins: true;
+$navbar-height: 5.1rem;
+
 
 .overflow-lg-x-visible {
     @include media-breakpoint-up(lg) {
@@ -407,6 +409,9 @@ article .callout {
 }
 
 nav {
+    .navbar-wrapper {
+        height: 5.1rem;
+    }
     .navbar-brand {
         text-transform: uppercase;
         line-height: $lead-font-size + 0.05rem;
