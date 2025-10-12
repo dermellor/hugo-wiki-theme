@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Create the footnote div element for inline display (hidden on mobile)
     const footnoteDiv = document.createElement('div');
-    footnoteDiv.className = 'footnote-content d-none d-lg-block';
+    footnoteDiv.className = 'footnote-content d-none d-lg-block text-body-tertiary';
     footnoteDiv.setAttribute('data-footnote-id', id);
     
     // Create a span for the footnote number
