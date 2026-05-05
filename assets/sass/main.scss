@@ -117,9 +117,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
-h1 {
-    @extend .display-2;
-}
+// h1 sizing now lives in mellor-style/sass/styles.scss
 
 audio {
     width: 100%;
