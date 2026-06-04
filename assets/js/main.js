@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
     function showNewsletterModal(){
       newsletterModal.show();
-      plausible('newsletterModal');
+      window.op('track', 'newsletter_modal');
       Bounceback.data.set("bounceback-visited", "1");
       Bounceback.disable();
     }
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function(){
       
       // Newsletter form submission tracking
       formElement.addEventListener("submit", function() {
-        plausible('newsletterSubmit');
+        window.op('track', 'newsletter_submit');
       });
     });
 
