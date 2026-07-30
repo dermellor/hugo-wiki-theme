@@ -3,6 +3,8 @@
   <div class="">
     <div class="d-md-flex flex-row d-grid gap-3">
       <div class="flex-grow-1">
+        {{/* Fallback-Ziel für native Formular-POSTs (wenn JS gecacht/aus ist). */}}
+        <input type="hidden" name="_redirect" value="{{ .redirect | default "https://www.marcelmellor.com/transactions/newsletter/optin/generic/" }}"/>
         <input type="hidden" name="utm_source"/>
         <input type="hidden" name="language" value="{{ .language }}"/>
         <input type="hidden" name="utm_medium" value="{{.utm_medium}}"/>
