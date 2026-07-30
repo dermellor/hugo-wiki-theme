@@ -86,24 +86,46 @@ document.addEventListener("DOMContentLoaded", function(){
     // Funktion aufrufen
     replaceImagePath();
 
-    //Botpoison 
-    document.querySelectorAll("form.newsletter").forEach(function(formElement){
+    // Newsletter: direct AJAX submit to the CRM endpoint. Spam filtering runs
+    // server-side (see marcelmellor-backend/lib/newsletter-guard). No Formspark,
+    // no captcha — the hidden honeypot field (hp_website) is sent along.
+    document.querySelectorAll("form.newsletter").forEach(function (formElement) {
       var buttonElement = formElement.querySelector("button");
-      console.log(formElement)
-      console.log(buttonElement);
-      formElement.addEventListener("botpoison-challenge-start", function () {
-        buttonElement.setAttribute("disabled", "disabled");
-      });
-      formElement.addEventListener("botpoison-challenge-success", function () {
-        //buttonElement.removeAttribute("disabled");
-      });
-      formElement.addEventListener("botpoison-challenge-error", function () {
-        buttonElement.removeAttribute("disabled");
-      });
-      
-      // Newsletter form submission tracking
-      formElement.addEventListener("submit", function() {
-        window.op('track', 'newsletter_submit');
+
+      formElement.addEventListener("submit", function (evt) {
+        evt.preventDefault();
+        if (buttonElement) buttonElement.setAttribute("disabled", "disabled");
+
+        try { window.op && window.op("track", "newsletter_submit"); } catch (e) {}
+
+        var payload = {};
+        formElement.querySelectorAll("input[name]").forEach(function (input) {
+          payload[input.name] = input.value;
+        });
+
+        var endpoint = formElement.getAttribute("action");
+        var redirect =
+          formElement.getAttribute("data-redirect") ||
+          "https://www.marcelmellor.com/transactions/newsletter/optin/generic/";
+
+        fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then(function (res) {
+            if (res.status === 429) {
+              // Rate limited — let the user try again shortly.
+              if (buttonElement) buttonElement.removeAttribute("disabled");
+              return;
+            }
+            // Any other response: send the user to the "check your email" page.
+            window.location.href = redirect;
+          })
+          .catch(function () {
+            // Network error — re-enable so the user can retry.
+            if (buttonElement) buttonElement.removeAttribute("disabled");
+          });
       });
     });
 
