@@ -388,7 +388,7 @@
         <strong>
             {{ $newsletterNumber := findRESubmatch  "newsletter\\/(.+)" .Params.newsletter 1 }}
             {{ $newsletterNumber = index (index $newsletterNumber 0) 1 }}
-            Dieser Artikel erschien in Ausgabe {{ $newsletterNumber }} meines wöchentlichen Newsletters "Tech is Good". Du kannst ihn <a href="/newsletter">hier abonnieren</a>.
+            Dieser Artikel erschien in Ausgabe {{ $newsletterNumber }} meines Newsletters „Zukunft machen“. Du kannst ihn <a href="/newsletter">hier abonnieren</a>.
         </strong>
 
       {{ end }}
@@ -412,15 +412,7 @@
       -->
 
         {{ if eq .Site.Language.Lang "de" }}
-          {{ if $.Param "newsletter_cta" }}
-
-            {{ if (ne ($.Param "newsletter_subscription_address") false) }}
-              {{ partial "newsletter.html" . }}
-            {{ end }}
-
-          {{ else }}
-            {{ partial "newsletter/form/big.html" (dict "utm_medium" "post") }}
-          {{ end }}
+          {{ partial "newsletter/form/big.html" (dict "utm_medium" "post") }}
         {{ end }}
 
 
