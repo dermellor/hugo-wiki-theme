@@ -5,7 +5,7 @@
     },
     "scripts": {
         "build:cookieconsent": "cp node_modules/cookieconsent/build/cookieconsent.min.css assets/css && cp node_modules/cookieconsent/build/cookieconsent.min.js assets/js",
-        "build:styles": "if [ -d assets/mellor-style/.git ]; then (cd assets/mellor-style && git pull); else rm -rf assets/mellor-style && git clone https://github.com/dermellor/mellor-style.git assets/mellor-style; fi",
+        "build:styles": "if [ -d assets/mellor-style/.git ]; then (cd assets/mellor-style && git fetch -q origin && git checkout -q 26af29e89e42da1fcdbc1aba6816ae60173ffb99); else rm -rf assets/mellor-style && git clone https://github.com/dermellor/mellor-style.git assets/mellor-style && git -C assets/mellor-style checkout -q 26af29e89e42da1fcdbc1aba6816ae60173ffb99; fi",
         "build:mellor-deps": "cd assets/mellor-style && npm install",
         "build": "npm run build:styles && npm run build:mellor-deps && npm run build:cookieconsent && npm run clean",
         "clean": "rm -f assets/css/style.css.tmp assets/css/style.rtl.css.tmp"
