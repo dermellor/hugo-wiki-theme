@@ -168,10 +168,10 @@
 		{{ $.Scratch.Set "content" $noteContent }}
 	{{ end }}
 
-	{{ $podcastSkalierbar := print "/podcast/skalierbar/" $fileName ".md" }}
+	{{ $podcastSkalierbar := print "/podcast/Skalierbar/" $fileName ".md" }}
 	{{ if not (os.FileExists $podcastSkalierbar) }}
 		{{ $fileNameSanitized := $fileName | replaceRE "\\?" "" | replaceRE "\\(([^)]+)\\)" "" | replaceRE " " "-" }}
-		{{ $podcastSkalierbar = print "/podcast/skalierbar/" $fileNameSanitized ".md" }}
+		{{ $podcastSkalierbar = print "/podcast/Skalierbar/" $fileNameSanitized ".md" }}
 	{{ end }}
 	{{ if os.FileExists $podcastSkalierbar }}
 		{{ $link := "" }}
